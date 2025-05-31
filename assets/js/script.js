@@ -594,25 +594,29 @@ function triggerGameOver(allLevelsSuccessfullyCompleted = true, levelFailedDue t
 }
 
 // Function to handle "Continue" button click
-continueBtn.addEventListener("click", () => {
-    const playerName = playerNameInput.value.trim();
-    const playerAge = playerAgeInput.value.trim();
-    const playerGender = playerGenderSelect.value;
+document.addEventListener("DOMContentLoaded", () => {
+    const continueBtn = document.getElementById("continueBtn");
+    continueBtn.addEventListener("click", () => {
+        console.log("Continue button clicked");
+        const playerName = playerNameInput.value.trim();
+        const playerAge = playerAgeInput.value.trim();
+        const playerGender = playerGenderSelect.value;
 
-    if (!playerName || !playerAge || !playerGender) {
-        alert("Please fill out all fields before continuing.");
-        return;
-    }
+        if (!playerName || !playerAge || !playerGender) {
+            alert("Please fill out all fields before continuing.");
+            return;
+        }
 
-    // Display player name and hide welcome screen
-    playerNameDisplay.textContent = playerName;
-    welcomeScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
+        // Display player name and hide welcome screen
+        playerNameDisplay.textContent = playerName;
+        welcomeScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
 
-    // Show "How to Play" instructions
-    const howToPlayElement = document.getElementById("howToPlay");
-    howToPlayElement.textContent = "Guess the country using emojis! Type your answer below.";
-    howToPlayElement.classList.remove("hidden");
+        // Show "How to Play" instructions
+        const howToPlayElement = document.getElementById("howToPlay");
+        howToPlayElement.textContent = "Guess the country using emojis! Type your answer below.";
+        howToPlayElement.classList.remove("hidden");
+    });
 });
 
 if(submitBtn) submitBtn.addEventListener("click", handleSubmitAnswer);
