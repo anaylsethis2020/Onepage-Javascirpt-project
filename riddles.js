@@ -1,0 +1,22 @@
+const riddles = [
+  { emoji: "🔗🔗🔗🅰️", answer: "china" },
+  { emoji: "🧊🅰️", answer: "cuba" },
+  { emoji: "🍳🅰️🤰", answer: "panama" },
+  { emoji: "🆕💤🖼️", answer: "new zealand" },
+  { emoji: "🐄🪨🅾️", answer: "morocco" },
+  { emoji: "📩🦌🦵🅰️", answer: "indonesia" },
+  { emoji: "🍐🦘", answer: "peru" },
+  { emoji: "🐋🐬", answer: "wales" },
+  { emoji: "👖✅", answer: "denmark" },
+  { emoji: "💈🖼️", answer: "poland" },
+  { emoji: "4️⃣🐜🐜", answer: "france" },
+  { emoji: "📦🇺⚽", answer: "portugal" },
+  { emoji: "👁🏃", answer: "iran" },
+  { emoji: "🇯 🍳", answer: "japan" },
+  { emoji: "👙💤🤧", answer: "brazil" },
+  { emoji: "🧍‍♂️🅰️", answer: "kenya" },
+  { emoji: "🎤🅰️🥃", answer: "singapore" },
+  { emoji: "🍭🍬👖", answer: "sweden" },
+  { emoji: "S👂🐝🅰️", answer: "serbia" },
+  { emoji: "😡⛽🚗", answer: "madagascar" }
+];

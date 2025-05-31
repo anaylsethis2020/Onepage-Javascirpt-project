@@ -1,53 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <!-- Required meta tags for responsiveness -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Page title -->
-  <title>Emoji Riddle Quiz - Speak Your Answer</title>
-  
-  <!-- Link to external CSS file -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emoji Quiz Game - Guess the Country</title>
+    
+    <link rel="stylesheet" href="assets/css/style.css" /> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet"> 
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 
 <body>
-  <!-- Header with main title -->
-  <header>
-    <h1>🎤 Emoji Riddle Quiz</h1>
-    <p>Guess the country using emojis — type it or speak it!</p>
-  </header>
+    <audio id="background-music" loop></audio>
+    <audio id="celebration-audio"></audio>
 
-  <!-- Main content area -->
-  <main>
-    <section class="quiz-box">
-        <section class="quiz-box">
-      <!-- Emoji clue -->
-      <div id="emoji">👙 + 💤 + 🤧</div>
+    <aside id="language-sidebar">
+        <h3 data-translate-key="selectLanguage">Select language</h3>
+        <div class="flag-grid">
+            <button class="flag-btn" data-lang="us" title="English"><img src="https://flagcdn.com/w40/us.png" alt="US Flag" /></button>
+            <button class="flag-btn" data-lang="es" title="Español"><img src="https://flagcdn.com/w40/es.png" alt="Spain Flag" /></button>
+            <button class="flag-btn" data-lang="br" title="Português (Brasil)"><img src="https://flagcdn.com/w40/br.png" alt="Brazil Flag" /></button>
+            <button class="flag-btn" data-lang="fr" title="Français"><img src="https://flagcdn.com/w40/fr.png" alt="France Flag" /></button>
+            <button class="flag-btn" data-lang="de" title="Deutsch"><img src="https://flagcdn.com/w40/de.png" alt="Germany Flag" /></button>
+            <button class="flag-btn" data-lang="it" title="Italiano"><img src="https://flagcdn.com/w40/it.png" alt="Italy Flag" /></button>
+            <button class="flag-btn" data-lang="ko" title="한국어"><img src="https://flagcdn.com/w40/kr.png" alt="South Korea Flag" /></button>
+            <button class="flag-btn" data-lang="zh" title="中文"><img src="https://flagcdn.com/w40/cn.png" alt="China Flag" /></button>
+            <button class="flag-btn" data-lang="ja" title="日本語"><img src="https://flagcdn.com/w40/jp.png" alt="Japan Flag" /></button>
+            <button class="flag-btn" data-lang="tr" title="Türkçe"><img src="https://flagcdn.com/w40/tr.png" alt="Turkey Flag" /></button>
+            <button class="flag-btn" data-lang="ar" title="العربية"><img src="https://flagcdn.com/w40/sa.png" alt="Saudi Arabia Flag" /></button>
+            <button class="flag-btn" data-lang="ru" title="Русский"><img src="https://flagcdn.com/w40/ru.png" alt="Russia Flag" /></button>
+            <button class="flag-btn" data-lang="hi" title="हिन्दी (भारत)"><img src="https://flagcdn.com/w40/in.png" alt="India Flag" /></button>
+            <button class="flag-btn" data-lang="ur" title="اردو (پاکستان)"><img src="https://flagcdn.com/w40/pk.png" alt="Pakistan Flag" /></button>
+        </div>
+    </aside>
 
-      <!-- Input field for user's guess -->
-      <input type="text" id="answerInput" placeholder="Type your answer here...">
+    <div id="main-content-area">
+        <div id="header-controls">
+            <button id="menu-btn" data-translate-key="menu"> <span>☰</span> </button>
+            <button id="theme-toggle" title="Toggle theme">
+                <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.04 19.96l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.04 4.04l-.707-.707" /></svg>
+                <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            </button>
+        </div>
 
-      <!-- Button to check typed answer -->
-      <button onclick="checkAnswer()">Submit</button>
+        <section id="welcomeScreen">
+            <h1 data-translate-key="welcomeTitle">Welcome to the Ultimate Emoji Country Quiz!</h1>
+            <input type="text" id="playerName" placeholder="Enter your name" data-translate-placeholder="enterNamePlaceholder" />
+            <input type="number" id="playerAge" placeholder="Enter your age" data-translate-placeholder="enterAgePlaceholder" />
+            <select id="playerGender">
+                <option value="" data-translate-key="selectGender">Select your gender</option>
+                <option value="Male" data-translate-key="male">Male</option>
+                <option value="Female" data-translate-key="female">Female</option>
+                <option value="Other" data-translate-key="other">Other</option>
+            </select>
+            <fieldset>
+                <legend data-translate-key="selectDifficulty">Select Difficulty</legend>
+                <div>
+                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy" checked>
+                    <label for="difficultyEasy" data-translate-key="easy">Easy</label>
+                </div>
+                <div>
+                    <input type="radio" id="difficultyMedium" name="difficulty" value="medium">
+                    <label for="difficultyMedium" data-translate-key="medium">Medium</label>
+                </div>
+                <div>
+                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
+                    <label for="difficultyHard" data-translate-key="hard">Hard</label>
+                </div>
+            </fieldset>
+            <button id="continueBtn" data-translate-key="continue">Continue</button>
+        </section>
 
-      <!-- Button to activate speech recognition -->
-      <button onclick="startListening()">🎙 Speak</button>
+        <section id="gameScreen" class="hidden">
+            <div class="quiz-box">
+                <div id="current-level-display" data-translate-key="currentLevelPrefix">Current Level: Easy</div>
+                <div class="timer-container">
+                    <svg id="timerDisplay" class="timer-clock" viewBox="0 0 100 100">
+                        <path class="timer-track" d="M 50,50 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"></path>
+                        <path class="timer-progress" d="M 50,50 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0" style="stroke-dasharray: 282.743; stroke-dashoffset: 0;"></path>
+                        <text x="50" y="50" id="timerText">30</text>
+                    </svg>
+                </div>
+                <h2 id="howToPlay" data-translate-key="instruction">Guess the country using emojis!</h2>
+                 <div id="lives-display-container"> 
+                    <span data-translate-key="livesLeftLabel">Lives Left:</span> <span id="livesLeftDisplay">3</span>
+                </div>
+                <div id="emoji" class="emoji-clue">🔗 + 🅰️</div>
+                <input type="text" id="answerInput" placeholder="Type your answer here..." data-translate-placeholder="typeAnswerPlaceholder" />
+                
+                <div class="scores-area">
+                    <p class="score-line">
+                        <strong data-translate-key="gameScorePrefix">Game</strong>:
+                        <span data-translate-key="correctScoreLabel">Correct</span> <span id="overallCorrectScoreDisplay">0</span> |
+                        <span data-translate-key="wrongScoreLabel">Wrong</span> <span id="overallWrongScoreDisplay">0</span>
+                    </p>
+                    <p class="score-line">
+                        <strong data-translate-key="levelScorePrefix">Level (<span id="currentDifficultyNameDisplay">Easy</span>)</strong>:
+                        <span data-translate-key="correctScoreLabel">Correct</span> <span id="levelCorrectScoreDisplay">0</span> |
+                        <span data-translate-key="wrongScoreLabel">Wrong</span> <span id="levelWrongScoreDisplay">0</span>
+                    </p>
+                    <p class="score-line">
+                        <span data-translate-key="playerNameLabel">Player:</span> <span id="playerNameDisplay">Player</span> |
+                        <span data-translate-key="highScoreLabel">High Score:</span> <span id="highScoreDisplay">0</span> </p>
+                </div>
 
-      <!-- Feedback message shown after submitting -->
-      <div id="feedback"></div>
-    </section>
-      
-    </section>
-  </main>
+                <div id="feedback"></div>
 
-  <!-- Footer area -->
-  <footer>
-    <p>© 2025 Abel Beyene — Speak Your Answer Edition</p>
-  </footer>
+                <div class="btn-group">
+                    <button id="submitBtn" data-translate-key="submit">Submit</button>
+                    <button id="hintBtn" data-translate-key="hint" class="hidden">💡 Hint</button> 
+                    <button id="nextBtn" data-translate-key="next" class="hidden">Next</button>
+                    <button id="restartLevelBtn" data-translate-key="restartLevel">Restart Level</button>
+                    <button id="restartGameBtn" data-translate-key="restartGame">Restart Full Game</button> 
+                </div>
+            </div>
+        </section>
 
-  <!-- Link to external JavaScript file -->
-  <script src="script.js"></script>
+        <footer>
+            <p data-translate-key="footerText">© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)</p>
+        </footer>
+    </div>
+
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button" id="modal-close">&times;</span>
+            <h2 data-translate-key="gameOverTitle">Game Over!</h2>
+            <p id="game-over-final-message" data-translate-key="gameOverMessage">You've completed all available riddles!</p>
+            <p> 
+                <span data-translate-key="finalScoreLabel">Your final score:</span> <span id="final-score-display">0</span>
+            </p>
+            <button id="modal-play-again-button" data-translate-key="playAgainFromWelcome">Start New Game (from Welcome)</button>
+        </div>
+    </div>
+
+    <div id="level-completion-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button" id="level-completion-modal-close">&times;</span>
+            <div class="victory-stars">
+                <span>⭐</span><span>⭐</span><span>⭐</span>
+            </div>
+            <h2 id="level-completion-title" data-translate-key="levelCompletedTitle">Level Completed!</h2>
+            <p><span class="celebration-emoji">🥳</span></p> 
+            <p id="level-completion-message" data-translate-key="levelCompletedMessageDefault">Well done!</p>
+            <button id="level-completion-next-level-button" data-translate-key="nextLevel">Next Level</button>
+            <button id="level-completion-play-again-button" data-translate-key="playAgainSameLevel">Play Again (Same Level)</button>
+        </div>
+    </div>
+
+    <div id="max-attempts-modal" class="modal hidden"> 
+        <div class="modal-content">
+            <span class="modal-close-button" id="max-attempts-modal-close">&times;</span>
+            <h2 data-translate-key="maxAttemptsTitle">Max Attempts Reached</h2>
+            <p data-translate-key="maxAttemptsMessage">You've used all your game attempts. Restart the full game to play again with fresh attempts.</p>
+            <button id="max-attempts-restart-game-button" data-translate-key="restartGame">Restart Full Game</button>
+        </div>
+    </div>
+
+    <div id="game-menu-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-button" id="game-menu-modal-close">&times;</span>
+            <h2 data-translate-key="menuTitle">Game Menu</h2>
+            <button id="menu-return-welcome" data-translate-key="menuReturnToWelcome">Return to Welcome</button>
+            <button id="menu-toggle-sound" data-translate-key="menuToggleSound">Sound: ON</button>
+            <button id="menu-toggle-music" data-translate-key="menuToggleMusic">Music: ON</button> 
+        </div>
+    </div>
+
+    <script type="module" src="assets/js/script.js"></script> 
 </body>
 </html>
