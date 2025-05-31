@@ -569,25 +569,27 @@ function triggerNoLivesGameOver() {
     nextBtn.classList.add("hidden");
 }
 
-function triggerGameOver(allLevelsSuccessfullyCompleted = true, levelFailedDue toMistakes = false) { 
+function triggerGameOver(allLevelsSuccessfullyCompleted = true, levelFailedDueToMistakes = false) { 
     stopTimer();
     stopBackgroundMusic();
-    if(finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
+    if (finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
     
     let msgKey;
     if (allLevelsSuccessfullyCompleted) {
         msgKey = "gameOverMessage"; 
     } else if (levelFailedDueToMistakes) {
         msgKey = "gameOverLevelFailedMistakes";
-    }
-    else { 
-         msgKey = "gameOverManyMistakesOrEarlyExit"; 
+    } else { 
+        msgKey = "gameOverManyMistakesOrEarlyExit"; 
     }
     
-    if(gameOverFinalMessage) gameOverFinalMessage.textContent = translations[currentLanguage]?.[msgKey] || "Game Over. Thanks for playing!";
+    if (gameOverFinalMessage) {
+        gameOverFinalMessage.textContent = translations[currentLanguage]?.[msgKey] || "Game Over. Thanks for playing!";
+    }
 
-
-    if(gameOverModal) gameOverModal.style.display = "block"; 
+    if (gameOverModal) {
+        gameOverModal.style.display = "block"; 
+    }
     answerInput.disabled = true;
     submitBtn.classList.add("hidden");
     nextBtn.classList.add("hidden");
