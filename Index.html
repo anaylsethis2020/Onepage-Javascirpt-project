@@ -2,55 +2,129 @@
 <html lang="en">
 
 <head>
+    <!-- 
+        Meta Information
+        - Sets character encoding to UTF-8 for universal character support.
+        - Ensures the page is responsive by setting the viewport meta tag.
+        - Title: Emoji Quiz Game - Guess the Country
+    -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Emoji Quiz Game - Guess the Country</title>
-    
-    <link rel="stylesheet" href="assets/css/style.css" /> 
-    
+
+    <!-- 
+        Stylesheets
+        - Linking external CSS for styling the page.
+        - Fonts: Includes Google Fonts for custom typography.
+    -->
+    <link rel="stylesheet" href="assets/css/style.css" />
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet"> 
-    
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+
+    <!-- 
+        External Libraries
+        - Tone.js: A JavaScript library for audio synthesis and manipulation.
+    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 
 <body>
+    <!-- 
+        Audio Elements
+        - Background Music: Loops continuously during gameplay.
+        - Celebration Audio: Plays on specific events like level completion.
+    -->
     <audio id="background-music" loop></audio>
     <audio id="celebration-audio"></audio>
 
+    <!-- 
+        Language Sidebar
+        - Allows users to select their preferred language.
+        - Each button represents a language with a flag icon.
+    -->
     <aside id="language-sidebar">
+        <!-- Sidebar Heading -->
         <h3 data-translate-key="selectLanguage">Select language</h3>
+
+        <!-- Grid of Flag Buttons -->
         <div class="flag-grid">
-            <button class="flag-btn" data-lang="us" title="English"><img src="https://flagcdn.com/w40/us.png" alt="US Flag" /></button>
-            <button class="flag-btn" data-lang="es" title="Español"><img src="https://flagcdn.com/w40/es.png" alt="Spain Flag" /></button>
-            <button class="flag-btn" data-lang="br" title="Português (Brasil)"><img src="https://flagcdn.com/w40/br.png" alt="Brazil Flag" /></button>
-            <button class="flag-btn" data-lang="fr" title="Français"><img src="https://flagcdn.com/w40/fr.png" alt="France Flag" /></button>
-            <button class="flag-btn" data-lang="de" title="Deutsch"><img src="https://flagcdn.com/w40/de.png" alt="Germany Flag" /></button>
-            <button class="flag-btn" data-lang="it" title="Italiano"><img src="https://flagcdn.com/w40/it.png" alt="Italy Flag" /></button>
-            <button class="flag-btn" data-lang="ko" title="한국어"><img src="https://flagcdn.com/w40/kr.png" alt="South Korea Flag" /></button>
-            <button class="flag-btn" data-lang="zh" title="中文"><img src="https://flagcdn.com/w40/cn.png" alt="China Flag" /></button>
-            <button class="flag-btn" data-lang="ja" title="日本語"><img src="https://flagcdn.com/w40/jp.png" alt="Japan Flag" /></button>
-            <button class="flag-btn" data-lang="tr" title="Türkçe"><img src="https://flagcdn.com/w40/tr.png" alt="Turkey Flag" /></button>
-            <button class="flag-btn" data-lang="ar" title="العربية"><img src="https://flagcdn.com/w40/sa.png" alt="Saudi Arabia Flag" /></button>
-            <button class="flag-btn" data-lang="ru" title="Русский"><img src="https://flagcdn.com/w40/ru.png" alt="Russia Flag" /></button>
-            <button class="flag-btn" data-lang="hi" title="हिन्दी (भारत)"><img src="https://flagcdn.com/w40/in.png" alt="India Flag" /></button>
-            <button class="flag-btn" data-lang="ur" title="اردو (پاکستان)"><img src="https://flagcdn.com/w40/pk.png" alt="Pakistan Flag" /></button>
+            <!-- Example: English -->
+            <button class="flag-btn" data-lang="us" title="English">
+                <img src="https://flagcdn.com/w40/us.png" alt="US Flag" />
+            </button>
+            <!-- Add similar buttons for other languages -->
+            <button class="flag-btn" data-lang="es" title="Español">
+                <img src="https://flagcdn.com/w40/es.png" alt="Spain Flag" />
+            </button>
+            <!-- Example: Portuguese -->
+            <button class="flag-btn" data-lang="br" title="Português (Brasil)">
+                <img src="https://flagcdn.com/w40/br.png" alt="Brazil Flag" />
+            </button>
+            <button class="flag-btn" data-lang="fr" title="Français">
+                <img src="https://flagcdn.com/w40/fr.png" alt="France Flag" />
+            </button>
+            <button class="flag-btn" data-lang="de" title="Deutsch">
+                <img src="https://flagcdn.com/w40/de.png" alt="Germany Flag" />
+            </button>
+            <button class="flag-btn" data-lang="it" title="Italiano">
+                <img src="https://flagcdn.com/w40/it.png" alt="Italy Flag" />
+            </button>
+            <button class="flag-btn" data-lang="ko" title="한국어">
+                <img src="https://flagcdn.com/w40/kr.png" alt="South Korea Flag" />
+            </button>
+            <button class="flag-btn" data-lang="zh" title="中文">
+                <img src="https://flagcdn.com/w40/cn.png" alt="China Flag" />
+            </button>
+            <button class="flag-btn" data-lang="ja" title="日本語">
+                <img src="https://flagcdn.com/w40/jp.png" alt="Japan Flag" />
+            </button>
         </div>
     </aside>
 
+    <!-- 
+        Main Content Area
+        - Contains the header controls and the welcome screen.
+    -->
     <div id="main-content-area">
+        <!-- 
+            Header Controls
+            - Menu Button: Opens the navigation menu.
+            - Theme Toggle: Switches between light and dark themes.
+        -->
         <div id="header-controls">
-            <button id="menu-btn" data-translate-key="menu"> <span>☰</span> </button>
+            <!-- Menu Button -->
+            <button id="menu-btn" data-translate-key="menu">
+                <span>☰</span>
+            </button>
+
+            <!-- Theme Toggle Button -->
             <button id="theme-toggle" title="Toggle theme">
-                <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.04 19.96l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.04 4.04l-.707-.707" /></svg>
-                <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                <!-- Light Theme Icon -->
+                <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.04 19.96l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.04 4.04l-.707-.707" />
+                </svg>
+                <!-- Dark Theme Icon -->
+                <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
             </button>
         </div>
 
+        <!-- 
+            Welcome Screen
+            - Displays the welcome message and input fields for player details.
+        -->
         <section id="welcomeScreen">
+            <!-- Welcome Message -->
             <h1 data-translate-key="welcomeTitle">Welcome to the Ultimate Emoji Country Quiz!</h1>
+
+            <!-- Player Name Input -->
             <input type="text" id="playerName" placeholder="Enter your name" data-translate-placeholder="enterNamePlaceholder" />
+
+            <!-- Player Age Input -->
             <input type="number" id="playerAge" placeholder="Enter your age" data-translate-placeholder="enterAgePlaceholder" />
+
+            <!-- Player Gender Selection -->
             <select id="playerGender">
                 <option value="" data-translate-key="selectGender">Select your gender</option>
                 <option value="Male" data-translate-key="male">Male</option>
@@ -172,4 +246,5 @@
 
     <script type="module" src="assets/js/script.js"></script> 
 </body>
+
 </html>
