@@ -710,7 +710,13 @@ window.onclick = (event) => {
 const translations = {
     us: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
     es: { menuMusic: "Música", musicOn: "SÍ", musicOff: "NO", menu: "Menú", menuTitle: "Menú del Juego", menuReturnToWelcome: "Volver a Bienvenida", menuToggleSound: "Activar/Desactivar Sonido", menuSound: "Sonido", soundOn: "SÍ", soundOff: "NO", currentLevelPrefix: "Nivel Actual", gameScorePrefix: "Juego", levelScorePrefix: "Nivel", livesLeftLabel: "Vidas Restantes:", gameOverNoLives: "¡No quedan vidas! Fin del juego. Empezando un juego nuevo...", selectLanguage: "Selecciona el idioma", welcomeTitle: "¡Bienvenido al Quiz Definitivo de Países con Emojis!", enterNamePlaceholder: "Ingresa tu nombre", enterAgePlaceholder: "Ingresa tu edad", selectGender: "Selecciona tu género", male: "Masculino", female: "Femenino", other: "Otro", continue: "Continuar", instruction: "¡Adivina el país usando emojis!", typeAnswerPlaceholder: "Escribe tu respuesta aquí...", highScoreLabel: "Puntuación Máxima:", correctScoreLabel: "Correctas:", wrongScoreLabel: "Incorrectas:", submit: "Enviar", hint: "Pista", next: "Siguiente", restartGame: "Reiniciar Juego Completo", footerText: "© 2025 Emoji Quiz | Quiz por Voz (Original por Abel Beyene)", gameOverTitle: "¡Juego Terminado!", gameOverMessage: "¡Has completado todos los acertijos disponibles!", finalScoreLabel: "Tu puntuación final:", playAgainFromWelcome: "Nuevo Juego (desde Bienvenida)", correctFeedback: "✅ ¡Correcto!", incorrectFeedback: "❌ ¡Incorrecto!", correctAnswerWas: "La respuesta era", playerNameLabel: "Jugador:", selectDifficulty: "Selecciona Dificultad", easy: "Fácil", medium: "Medio", hard: "Difícil", levelCompletedTitle: "¡Nivel Completado!", levelCompletedMessageDefault: "¡Bien hecho!", nextLevel: "Siguiente Nivel", level: "Nivel", completed: "Completado", levelCompletedCongrats: "¡Excelente trabajo!", allLevelsCompleted: "¡Has dominado todos los niveles!", timeUp: "¡Se acabó el tiempo!", emptyAnswer: "Por favor, ingresa una respuesta.", levelMistakesLabel: "Errores este nivel:", gameOverManyMistakesOrEarlyExit: "¡Buen esfuerzo! Intenta de nuevo para mejorar.", restartLevel: "Reiniciar Nivel", maxAttemptsTitle: "Máximos Intentos Alcanzados", maxAttemptsMessage: "Has usado todos tus intentos. Reinicia el juego completo para jugar de nuevo con intentos frescos.", playAgainSameLevel: "Jugar de Nuevo (Mismo Nivel)", gameOverLevelFailedMistakes: "Demasiados errores en este nivel. ¡Mejor suerte en el próximo intento!" },
-    // ... other language translations would need 'menuMusic', 'musicOn', 'musicOff' added ...
+    br: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    fr: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    de: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    it: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    ko: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    zh: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    ja: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" }
 };
 let currentLanguage = 'us'; 
 
@@ -810,3 +816,154 @@ document.addEventListener('DOMContentLoaded', () => {
 window.onerror = function (message, source, lineno, colno, error) {
     console.error(`Error: ${message} at ${source}:${lineno}:${colno}`, error);
 };
+
+// --- Basic Test Functions ---
+function runAllTests() {
+    console.log("Starting tests...");
+    testLanguageTranslation();
+    testTimerLogic();
+    testScoringLogic();
+    console.log("Tests finished. Check console for results.");
+}
+
+function assert(condition, message) {
+    if (!condition) {
+        console.error("Test Failed:", message);
+    } else {
+        console.log("Test Passed:", message);
+    }
+}
+
+function testLanguageTranslation() {
+    console.log("--- Testing Language Translation ---");
+    const originalLang = currentLanguage;
+    const welcomeTitleEl = document.getElementById('welcomeScreen')?.querySelector('h1');
+    const originalWelcomeTitle = welcomeTitleEl ? welcomeTitleEl.textContent : "";
+
+    applyTranslations('es');
+    const spanishWelcomeTitle = translations.es.welcomeTitle;
+    assert(welcomeTitleEl && welcomeTitleEl.textContent === spanishWelcomeTitle, "Spanish welcome title should be applied.");
+
+    // Reset to original language
+    applyTranslations(originalLang);
+    assert(welcomeTitleEl && welcomeTitleEl.textContent === originalWelcomeTitle, "Language should reset to original.");
+    console.log("Language Translation test done.");
+}
+
+function testTimerLogic() {
+    console.log("--- Testing Timer Logic ---");
+    // Manual check for countdown is more practical here without async test framework
+    console.log("Timer Test: About to start timer for 3 seconds. Manually observe if timer text updates.");
+
+    // Ensure game screen is visible for timer elements to be active
+    // This is a simplified setup; real game conditions would be more complex
+    if (welcomeScreen && gameScreen && welcomeScreen.classList.contains('hidden') === false) {
+        welcomeScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        // Mockup essential elements if not fully in game mode
+        if (!document.getElementById('emoji').textContent) {
+             document.getElementById('emoji').textContent = "🧪"; // Test emoji
+        }
+        if (!document.getElementById('answerInput').value) {
+            document.getElementById('answerInput').value = "test";
+        }
+    }
+
+    // Test reset
+    timeLeft = 10;
+    if(timerText) timerText.textContent = timeLeft;
+    resetTimer();
+    assert(timeLeft === TIME_LIMIT, `Timer should reset to TIME_LIMIT (${TIME_LIMIT}). Actual: ${timeLeft}`);
+    if(timerText) assert(timerText.textContent == TIME_LIMIT, `Timer display should reset to ${TIME_LIMIT}.`);
+
+    startTimer(); // Starts a 30s timer by default
+
+    // Check if timer interval is set
+    assert(timerInterval !== null, "Timer interval should be set after startTimer().");
+
+    setTimeout(() => {
+        const timeAfterDelay = timeLeft;
+        console.log(`Timer Test: After ~3s, timeLeft is: ${timeAfterDelay}. Initial was ${TIME_LIMIT}`);
+        assert(timeAfterDelay < TIME_LIMIT - 1, `Timer should have counted down. Expected < ${TIME_LIMIT - 1}, Got: ${timeAfterDelay}`);
+        stopTimer();
+        assert(timerInterval === null, "Timer interval should be null after stopTimer().");
+
+        // Reset screen state if changed for test
+        if (document.getElementById('emoji').textContent === "🧪") {
+             welcomeScreen.classList.remove('hidden');
+             gameScreen.classList.add('hidden');
+        }
+        console.log("Timer Logic test done. Manual observation for countdown was required.");
+    }, 3000); // Check after 3 seconds
+}
+
+function testScoringLogic() {
+    console.log("--- Testing Scoring Logic ---");
+    // Setup initial state for scoring test
+    resetFullGame(); // Resets scores and lives
+    currentDifficultyIndex = 0; // Easy
+    currentDifficulty = difficultyOrder[currentDifficultyIndex];
+    riddles = [...allRiddles[currentDifficulty]];
+    currentRiddleIndexInLevel = 0; // First riddle
+
+    // Mockup that game has started and first riddle is loaded
+    // These would normally be set by startGameSession() and loadNextRiddle()
+    livesLeft = MAX_LIVES;
+    overallCorrectScore = 0;
+    overallWrongScore = 0;
+    correctAnswersThisLevel = 0;
+    mistakesThisLevel = 0;
+    updateAllScoreDisplays();
+    updateLivesDisplay();
+    if(emojiDisplay) emojiDisplay.textContent = riddles[currentRiddleIndexInLevel].emoji;
+    if(answerInput) answerInput.value = "";
+
+
+    // Test 1: Correct Answer
+    const correctAnswer = riddles[currentRiddleIndexInLevel].answer;
+    if(answerInput) answerInput.value = correctAnswer;
+    handleSubmitAnswer(); // Assumes submitBtn click or Enter keypress
+    assert(overallCorrectScore === 1, `Overall correct score should be 1. Got: ${overallCorrectScore}`);
+    assert(correctAnswersThisLevel === 1, `Level correct score should be 1. Got: ${correctAnswersThisLevel}`);
+    assert(livesLeft === MAX_LIVES, `Lives should remain ${MAX_LIVES} after correct answer. Got: ${livesLeft}`);
+    if(overallCorrectScoreDisplay) assert(overallCorrectScoreDisplay.textContent === "1", "Overall correct score display should be '1'.");
+
+    // Test 2: Incorrect Answer (advancing riddle first)
+    currentRiddleIndexInLevel++; // Move to next riddle for fair test
+    if (currentRiddleIndexInLevel < riddles.length) {
+        if(emojiDisplay) emojiDisplay.textContent = riddles[currentRiddleIndexInLevel].emoji;
+        if(answerInput) answerInput.value = "wrong answer";
+        const initialLives = livesLeft;
+        handleSubmitAnswer();
+        assert(overallWrongScore === 1, `Overall wrong score should be 1. Got: ${overallWrongScore}`);
+        assert(mistakesThisLevel === 1, `Level mistakes should be 1. Got: ${mistakesThisLevel}`);
+        assert(livesLeft === initialLives - 1, `Lives should decrement after incorrect answer. Expected ${initialLives - 1}, Got: ${livesLeft}`);
+        if(overallWrongScoreDisplay) assert(overallWrongScoreDisplay.textContent === "1", "Overall wrong score display should be '1'.");
+    } else {
+        console.warn("Skipping incorrect answer test: Not enough riddles in easy difficulty for this test setup.");
+    }
+
+    // Test 3: Time up (simulated)
+    // Need to ensure a riddle is "loaded"
+    currentRiddleIndexInLevel++;
+    if (currentRiddleIndexInLevel < riddles.length) {
+        if(emojiDisplay) emojiDisplay.textContent = riddles[currentRiddleIndexInLevel].emoji;
+        const initialLivesBeforeTimeUp = livesLeft;
+        const initialWrongScore = overallWrongScore;
+        const initialLevelMistakes = mistakesThisLevel;
+
+        handleTimeUp(); // Directly call handleTimeUp
+        assert(overallWrongScore === initialWrongScore + 1, `Overall wrong score should increment after time up. Expected ${initialWrongScore + 1}, Got: ${overallWrongScore}`);
+        assert(mistakesThisLevel === initialLevelMistakes + 1, `Level mistakes should increment after time up. Expected ${initialLevelMistakes + 1}, Got: ${mistakesThisLevel}`);
+        assert(livesLeft === initialLivesBeforeTimeUp - 1, `Lives should decrement after time up. Expected ${initialLivesBeforeTimeUp - 1}, Got: ${livesLeft}`);
+    } else {
+        console.warn("Skipping time up test: Not enough riddles in easy difficulty for this test setup.");
+    }
+
+    // Clean up / reset global state if necessary for other tests or manual play
+    resetFullGame();
+    console.log("Scoring Logic test done.");
+}
+
+// To run tests, open browser console and type: runAllTests()
+// Note: Timer test has a manual observation part and uses setTimeout for async check.
