@@ -3,28 +3,51 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// DOM Elements initialization - moved to top
+// Firebase configuration
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" }; 
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-emoji-quiz-merged';
+
+let fbApp, fbAuth, fbDb;
+let currentUserId = null;
+let isAuthReady = false;
+
+try {
+    fbApp = initializeApp(firebaseConfig);
+    fbAuth = getAuth(fbApp);
+    fbDb = getFirestore(fbApp);
+    setLogLevel('debug'); 
+    console.log("Firebase initialized successfully.");
+} catch (error) {
+    console.error("Firebase initialization error:", error);
+    const gameScreenElement = document.getElementById('gameScreen'); 
+    if(gameScreenElement) gameScreenElement.innerHTML = `<p style="color:red;">Error initializing Firebase: ${error.message}. High scores will not be saved.</p>`;
+}
+
+// DOM Elements
 const welcomeScreen = document.getElementById("welcomeScreen");
 const gameScreen = document.getElementById("gameScreen"); 
 const continueBtn = document.getElementById("continueBtn");
 const playerNameInput = document.getElementById("playerName");
 const playerNameDisplay = document.getElementById("playerNameDisplay");
+
 const emojiDisplay = document.getElementById("emoji");
 const answerInput = document.getElementById("answerInput");
 const submitBtn = document.getElementById("submitBtn");
 const hintBtn = document.getElementById("hintBtn"); 
 const nextBtn = document.getElementById("nextBtn");
 const restartLevelBtn = document.getElementById("restartLevelBtn");
-const restartGameBtn = document.getElementById("restartGameBtn");
-const overallCorrectScoreDisplay = document.getElementById("overallCorrectScoreDisplay");
-const overallWrongScoreDisplay = document.getElementById("overallWrongScoreDisplay");
-const levelCorrectScoreDisplay = document.getElementById("levelCorrectScoreDisplay");
-const levelWrongScoreDisplay = document.getElementById("levelWrongScoreDisplay");
-const currentDifficultyNameDisplay = document.getElementById("currentDifficultyNameDisplay");
+const restartGameBtn = document.getElementById("restartGameBtn"); 
+
+const overallCorrectScoreDisplay = document.getElementById("overallCorrectScoreDisplay"); 
+const overallWrongScoreDisplay = document.getElementById("overallWrongScoreDisplay"); 
+const levelCorrectScoreDisplay = document.getElementById("levelCorrectScoreDisplay"); 
+const levelWrongScoreDisplay = document.getElementById("levelWrongScoreDisplay"); 
+const currentDifficultyNameDisplay = document.getElementById("currentDifficultyNameDisplay"); 
+
 const feedbackDisplay = document.getElementById("feedback");
-const highScoreDisplay = document.getElementById("highScoreDisplay");
-const livesLeftDisplay = document.getElementById("livesLeftDisplay");
-const currentLevelDisplayElement = document.getElementById("current-level-display");
+const highScoreDisplay = document.getElementById("highScoreDisplay"); 
+const livesLeftDisplay = document.getElementById("livesLeftDisplay"); 
+const currentLevelDisplayElement = document.getElementById("current-level-display"); 
 
 const themeToggle = document.getElementById('theme-toggle');
 const themeIconLight = document.getElementById('theme-icon-light');
@@ -55,44 +78,9 @@ const menuReturnWelcomeBtn = document.getElementById('menu-return-welcome');
 const menuToggleSoundBtn = document.getElementById('menu-toggle-sound'); 
 const menuToggleMusicBtn = document.getElementById('menu-toggle-music');
 
-// Audio elements
-const backgroundMusic = document.getElementById("background-music");
-const celebrationAudio = document.getElementById("celebration-audio");
-let audioContext = null;
+const backgroundMusic = document.getElementById('background-music'); 
+const celebrationAudio = document.getElementById('celebration-audio'); 
 
-// Initialize audio only after user interaction
-function initializeAudio() {
-    return new Promise((resolve) => {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        // Resume audio context on user interaction
-        if (audioContext.state === 'suspended') {
-            const resumeAudio = async () => {
-                await audioContext.resume();
-                document.removeEventListener('click', resumeAudio);
-                document.removeEventListener('touchstart', resumeAudio);
-                resolve();
-            };
-            
-            document.addEventListener('click', resumeAudio);
-            document.addEventListener('touchstart', resumeAudio);
-        } else {
-            resolve();
-        }
-        
-        // Set up audio sources with proper paths
-        backgroundMusic.src = new URL('../Music/during gameplay.mp3', import.meta.url).href;
-        celebrationAudio.src = new URL('../Music/level complete celebration .mp3', import.meta.url).href;
-    });
-}
-
-// Add click listener to continue button for audio initialization
-continueBtn.addEventListener('click', () => {
-    initializeAudio();
-    // ... rest of your continue button logic
-});
 
 const timerSVGPath = document.querySelector("#timerDisplay .timer-progress");
 const timerText = document.getElementById("timerText");
@@ -555,10 +543,10 @@ function handleLevelEnd() {
         levelCompletionMessage.textContent = translations[currentLanguage]?.levelCompletedCongrats || "Excellent work!";
         playCelebrationSoundOrMusic(); 
         triggerConfetti(); 
-        modalSystem.showModal(levelCompletionModal);
+        levelCompletionModal.style.display = "block"; 
         if (currentDifficultyIndex >= difficultyOrder.length - 1) { 
             levelCompletionNextLevelButton.classList.add('hidden'); 
-            levelCompletionMessage.textContent += ` ${translations[currentLanguage]?.allLevelsCompleted || "You've mastered all levels!"}`;
+             levelCompletionMessage.textContent += ` ${translations[currentLanguage]?.allLevelsCompleted || "You've mastered all levels!"}`;
         } else {
             levelCompletionNextLevelButton.classList.remove('hidden');
         }
@@ -572,7 +560,7 @@ function triggerNoLivesGameOver() {
     stopBackgroundMusic();
     if(gameOverFinalMessage) gameOverFinalMessage.textContent = translations[currentLanguage]?.gameOverNoLives || "No lives left! Game Over.";
     if(finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
-    if(gameOverModal) modalSystem.showModal(gameOverModal);
+    if(gameOverModal) gameOverModal.style.display = "block"; 
     
     answerInput.disabled = true;
     submitBtn.classList.add("hidden");
@@ -603,129 +591,95 @@ function triggerGameOver(allLevelsSuccessfullyCompleted = true, levelFailedDueTo
     nextBtn.classList.add("hidden");
 }
 
-// Modal Management System
-const modalSystem = {
-    activeModals: [],
-    
-    showModal: function(modal) {
-        if (!modal) return;
-        
-        // Hide all other modals first
-        this.hideAllModals();
-        
-        modal.style.display = 'flex';
-        this.activeModals.push(modal);
-        
-        // Prevent background scrolling
-        document.body.style.overflow = 'hidden';
-    },
-    
-    hideModal: function(modal) {
-        if (!modal) return;
-        
-        modal.style.display = 'none';
-        const index = this.activeModals.indexOf(modal);
-        if (index > -1) {
-            this.activeModals.splice(index, 1);
-        }
-        
-        // Restore scrolling if no modals are active
-        if (this.activeModals.length === 0) {
-            document.body.style.overflow = '';
-        }
-    },
-    
-    hideAllModals: function() {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => this.hideModal(modal));
-        this.activeModals = [];
-        document.body.style.overflow = '';
+if(continueBtn) continueBtn.addEventListener("click", startGameSession);
+if(submitBtn) submitBtn.addEventListener("click", handleSubmitAnswer);
+if(answerInput) answerInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !submitBtn.classList.contains("hidden")) {
+        handleSubmitAnswer();
     }
+});
+
+if(nextBtn) nextBtn.addEventListener("click", () => {
+    currentRiddleIndexInLevel++;
+    loadNextRiddle();
+});
+
+if(restartLevelBtn) restartLevelBtn.addEventListener("click", () => {
+    stopTimer(); 
+    startLevel(); 
+});
+
+if(restartGameBtn) restartGameBtn.addEventListener("click", resetFullGame); 
+
+// Menu Button Logic
+if(menuBtn) menuBtn.addEventListener('click', () => {
+    if(gameMenuModal) gameMenuModal.style.display = 'block';
+});
+if(gameMenuModalClose) gameMenuModalClose.onclick = () => gameMenuModal.style.display = 'none';
+if(menuReturnWelcomeBtn) menuReturnWelcomeBtn.addEventListener('click', () => {
+    if(gameMenuModal) gameMenuModal.style.display = 'none';
+    resetFullGame();
+});
+if(menuToggleSoundBtn) menuToggleSoundBtn.addEventListener('click', () => {
+    isSoundEnabled = !isSoundEnabled; 
+    menuToggleSoundBtn.textContent = `${translations[currentLanguage]?.menuSound || "Sound"}: ${isSoundEnabled ? (translations[currentLanguage]?.soundOn || "ON") : (translations[currentLanguage]?.soundOff || "OFF")}`;
+    localStorage.setItem('emojiQuizSoundEnabled', isSoundEnabled);
+    if (!isSoundEnabled) {
+        if (celebrationAudio) celebrationAudio.pause(); 
+    }
+});
+
+if(menuToggleMusicBtn) menuToggleMusicBtn.addEventListener('click', () => {
+    isMusicEnabled = !isMusicEnabled;
+    menuToggleMusicBtn.textContent = `${translations[currentLanguage]?.menuMusic || "Music"}: ${isMusicEnabled ? (translations[currentLanguage]?.musicOn || "ON") : (translations[currentLanguage]?.musicOff || "OFF")}`;
+    localStorage.setItem('emojiQuizMusicEnabled', isMusicEnabled);
+    if (isMusicEnabled) {
+        playBackgroundMusic();
+    } else {
+        pauseBackgroundMusic();
+    }
+});
+
+
+// Modal listeners
+if(modalCloseButton) modalCloseButton.onclick = () => gameOverModal.style.display = "none";
+if(modalPlayAgainButton) modalPlayAgainButton.onclick = () => { 
+    gameOverModal.style.display = "none";
+    resetFullGame(); 
 };
 
-// Update modal event listeners
-if(gameMenuModal) {
-    menuBtn.addEventListener('click', () => modalSystem.showModal(gameMenuModal));
-    gameMenuModalClose.onclick = () => modalSystem.hideModal(gameMenuModal);
-}
+if(levelCompletionModalClose) levelCompletionModalClose.onclick = () => levelCompletionModal.style.display = "none";
+if(levelCompletionNextLevelButton) levelCompletionNextLevelButton.onclick = () => {
+    levelCompletionModal.style.display = "none";
+    if (currentDifficultyIndex < difficultyOrder.length - 1) {
+        currentDifficultyIndex++;
+        startLevel();
+    } else {
+        triggerGameOver(true); 
+    }
+};
+if(levelCompletionPlayAgainButton) levelCompletionPlayAgainButton.onclick = () => {
+    levelCompletionModal.style.display = "none";
+    startLevel(); 
+};
 
-if(levelCompletionModal) {
-    levelCompletionModalClose.onclick = () => modalSystem.hideModal(levelCompletionModal);
-}
+if(maxAttemptsModalClose) maxAttemptsModalClose.onclick = () => maxAttemptsModal.style.display = "none";
+if(maxAttemptsRestartGameButton) maxAttemptsRestartGameButton.onclick = () => {
+    if(maxAttemptsModal) maxAttemptsModal.style.display = "none";
+    resetFullGame();
+};
 
-if(maxAttemptsModal) {
-    maxAttemptsModalClose.onclick = () => modalSystem.hideModal(maxAttemptsModal);
-}
-
-if(gameOverModal) {
-    modalCloseButton.onclick = () => modalSystem.hideModal(gameOverModal);
-}
-
-// Close modals when clicking outside
 window.onclick = (event) => {
-    if (event.target.classList.contains('modal')) {
-        modalSystem.hideModal(event.target);
-    }
+    if (event.target == gameOverModal) gameOverModal.style.display = "none";
+    if (event.target == levelCompletionModal) levelCompletionModal.style.display = "none";
+    if (event.target == maxAttemptsModal) maxAttemptsModal.style.display = "none";
+    if (event.target == gameMenuModal) gameMenuModal.style.display = "none"; 
 };
 
-// Firebase configuration object
-const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID
-};
-
-// Initialize Firebase with error handling
-let fbApp, fbAuth, fbDb;
-let currentUserId = null;
-let isAuthReady = false;
-
-try {
-    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY') {
-        throw new Error("Firebase configuration is not set up properly");
-    }
-    
-    fbApp = initializeApp(firebaseConfig);
-    fbAuth = getAuth(fbApp);
-    fbDb = getFirestore(fbApp);
-    setLogLevel('debug'); 
-    console.log("Firebase initialized successfully");
-    
-    // Initialize anonymous auth
-    signInAnonymously(fbAuth)
-        .then(() => {
-            console.log("Anonymous auth successful");
-        })
-        .catch((error) => {
-            console.error("Anonymous auth failed:", error);
-            handleOfflineMode();
-        });
-} catch (error) {
-    console.error("Firebase initialization failed:", error);
-    handleOfflineMode();
-}
-
-function handleOfflineMode() {
-    console.log("Switching to offline mode");
-    isAuthReady = true;
-    if (playerNameDisplay) {
-        playerNameDisplay.textContent = (playerNameInput?.value?.trim() || "Player") + " (Offline)";
-    }
-    // Set up local storage fallback for scores
-    if (!localStorage.getItem('localHighScore')) {
-        localStorage.setItem('localHighScore', '0');
-    }
-    if (highScoreDisplay) {
-        highScoreDisplay.textContent = localStorage.getItem('localHighScore') || '0';
-    }
-}
 
 // --- Language Translations ---
 const translations = {
-    us: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter a answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Jugar de Nuevo (Mismo Nivel)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
+    us: { menuMusic: "Music", musicOn: "ON", musicOff: "OFF", menu: "Menu", menuTitle: "Game Menu", menuReturnToWelcome: "Return to Welcome", menuToggleSound: "Toggle Sound", menuSound: "Sound", soundOn: "ON", soundOff: "OFF", currentLevelPrefix: "Current Level", gameScorePrefix: "Game", levelScorePrefix: "Level", livesLeftLabel: "Lives Left:", gameOverNoLives: "No lives left! Game Over. Starting a new game...", selectLanguage: "Select language", welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!", enterNamePlaceholder: "Enter your name", enterAgePlaceholder: "Enter your age", selectGender: "Select your gender", male: "Male", female: "Female", other: "Other", continue: "Continue", instruction: "Guess the country using emojis!", typeAnswerPlaceholder: "Type your answer here...", highScoreLabel: "High Score:", correctScoreLabel: "Correct:", wrongScoreLabel: "Wrong:", submit: "Submit", hint: "Hint", next: "Next", restartGame: "Restart Full Game", footerText: "© 2025 Emoji Quiz | Voice Powered Quiz (Original by Abel Beyene)", gameOverTitle: "Game Over!", gameOverMessage: "You've completed all available riddles!", finalScoreLabel: "Your final score:", playAgainFromWelcome: "Start New Game (from Welcome)", correctFeedback: "✅ Correct!", incorrectFeedback: "❌ Incorrect!", correctAnswerWas: "It was", playerNameLabel: "Player:", selectDifficulty: "Select Difficulty", easy: "Easy", medium: "Medium", hard: "Hard", levelCompletedTitle: "Level Completed!", levelCompletedMessageDefault: "Well done!", nextLevel: "Next Level", level: "Level", completed: "Completed", levelCompletedCongrats: "Excellent work!", allLevelsCompleted: "You've mastered all levels!", timeUp: "Time's up!", emptyAnswer: "Please enter an answer.", levelMistakesLabel: "Mistakes this level:", gameOverManyMistakesOrEarlyExit: "Good effort! Try again to improve your score.", restartLevel: "Restart Level", maxAttemptsTitle: "Max Attempts Reached", maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.", playAgainSameLevel: "Play Again (Same Level)", gameOverLevelFailedMistakes: "Too many mistakes this level. Better luck next attempt!" },
     es: { menuMusic: "Música", musicOn: "SÍ", musicOff: "NO", menu: "Menú", menuTitle: "Menú del Juego", menuReturnToWelcome: "Volver a Bienvenida", menuToggleSound: "Activar/Desactivar Sonido", menuSound: "Sonido", soundOn: "SÍ", soundOff: "NO", currentLevelPrefix: "Nivel Actual", gameScorePrefix: "Juego", levelScorePrefix: "Nivel", livesLeftLabel: "Vidas Restantes:", gameOverNoLives: "¡No quedan vidas! Fin del juego. Empezando un juego nuevo...", selectLanguage: "Selecciona el idioma", welcomeTitle: "¡Bienvenido al Quiz Definitivo de Países con Emojis!", enterNamePlaceholder: "Ingresa tu nombre", enterAgePlaceholder: "Ingresa tu edad", selectGender: "Selecciona tu género", male: "Masculino", female: "Femenino", other: "Otro", continue: "Continuar", instruction: "¡Adivina el país usando emojis!", typeAnswerPlaceholder: "Escribe tu respuesta aquí...", highScoreLabel: "Puntuación Máxima:", correctScoreLabel: "Correctas:", wrongScoreLabel: "Incorrectas:", submit: "Enviar", hint: "Pista", next: "Siguiente", restartGame: "Reiniciar Juego Completo", footerText: "© 2025 Emoji Quiz | Quiz por Voz (Original por Abel Beyene)", gameOverTitle: "¡Juego Terminado!", gameOverMessage: "¡Has completado todos los acertijos disponibles!", finalScoreLabel: "Tu puntuación final:", playAgainFromWelcome: "Nuevo Juego (desde Bienvenida)", correctFeedback: "✅ ¡Correcto!", incorrectFeedback: "❌ ¡Incorrecto!", correctAnswerWas: "La respuesta era", playerNameLabel: "Jugador:", selectDifficulty: "Selecciona Dificultad", easy: "Fácil", medium: "Medio", hard: "Difícil", levelCompletedTitle: "¡Nivel Completado!", levelCompletedMessageDefault: "¡Bien hecho!", nextLevel: "Siguiente Nivel", level: "Nivel", completed: "Completado", levelCompletedCongrats: "¡Excelente trabajo!", allLevelsCompleted: "¡Has dominado todos los niveles!", timeUp: "¡Se acabó el tiempo!", emptyAnswer: "Por favor, ingresa una respuesta.", levelMistakesLabel: "Errores este nivel:", gameOverManyMistakesOrEarlyExit: "¡Buen esfuerzo! Intenta de nuevo para mejorar.", restartLevel: "Reiniciar Nivel", maxAttemptsTitle: "Máximos Intentos Alcanzados", maxAttemptsMessage: "Has usado todos tus intentos. Reinicia el juego completo para jugar de nuevo con intentos frescos.", playAgainSameLevel: "Jugar de Nuevo (Mismo Nivel)", gameOverLevelFailedMistakes: "Demasiados errores en este nivel. ¡Mejor suerte en el próximo intento!" },
     // ... other language translations would need 'menuMusic', 'musicOn', 'musicOff' added ...
 };
