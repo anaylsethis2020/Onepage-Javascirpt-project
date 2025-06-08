@@ -28,8 +28,6 @@ const welcomeScreen = document.getElementById("welcomeScreen");
 const gameScreen = document.getElementById("gameScreen"); 
 const continueBtn = document.getElementById("continueBtn");
 const playerNameInput = document.getElementById("playerName");
-const playerAgeInput = document.getElementById("playerAge");
-const playerGenderSelect = document.getElementById("playerGender");
 const playerNameDisplay = document.getElementById("playerNameDisplay");
 
 const emojiDisplay = document.getElementById("emoji");
@@ -572,55 +570,28 @@ function triggerNoLivesGameOver() {
 function triggerGameOver(allLevelsSuccessfullyCompleted = true, levelFailedDueToMistakes = false) { 
     stopTimer();
     stopBackgroundMusic();
-    if (finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
+    if(finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
     
     let msgKey;
     if (allLevelsSuccessfullyCompleted) {
         msgKey = "gameOverMessage"; 
     } else if (levelFailedDueToMistakes) {
         msgKey = "gameOverLevelFailedMistakes";
-    } else { 
-        msgKey = "gameOverManyMistakesOrEarlyExit"; 
+    }
+    else { 
+         msgKey = "gameOverManyMistakesOrEarlyExit"; 
     }
     
-    if (gameOverFinalMessage) {
-        gameOverFinalMessage.textContent = translations[currentLanguage]?.[msgKey] || "Game Over. Thanks for playing!";
-    }
+    if(gameOverFinalMessage) gameOverFinalMessage.textContent = translations[currentLanguage]?.[msgKey] || "Game Over. Thanks for playing!";
 
-    if (gameOverModal) {
-        gameOverModal.style.display = "block"; 
-    }
+
+    if(gameOverModal) gameOverModal.style.display = "block"; 
     answerInput.disabled = true;
     submitBtn.classList.add("hidden");
     nextBtn.classList.add("hidden");
 }
 
-// Function to handle "Continue" button click
-document.addEventListener("DOMContentLoaded", () => {
-    const continueBtn = document.getElementById("continueBtn");
-    continueBtn.addEventListener("click", () => {
-        console.log("Continue button clicked");
-        const playerName = playerNameInput.value.trim();
-        const playerAge = playerAgeInput.value.trim();
-        const playerGender = playerGenderSelect.value;
-
-        if (!playerName || !playerAge || !playerGender) {
-            alert("Please fill out all fields before continuing.");
-            return;
-        }
-
-        // Display player name and hide welcome screen
-        playerNameDisplay.textContent = playerName;
-        welcomeScreen.classList.add("hidden");
-        gameScreen.classList.remove("hidden");
-
-        // Show "How to Play" instructions
-        const howToPlayElement = document.getElementById("howToPlay");
-        howToPlayElement.textContent = "Guess the country using emojis! Type your answer below.";
-        howToPlayElement.classList.remove("hidden");
-    });
-});
-
+if(continueBtn) continueBtn.addEventListener("click", startGameSession);
 if(submitBtn) submitBtn.addEventListener("click", handleSubmitAnswer);
 if(answerInput) answerInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter" && !submitBtn.classList.contains("hidden")) {
