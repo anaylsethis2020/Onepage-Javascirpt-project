@@ -333,25 +333,19 @@ body.dark #welcomeScreen fieldset label {
     color: #ecf0f1; /* Light gray color */
 }
 
-
-<<<<<<< HEAD
-.quiz-box { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-align: center; width: 100%; max-width: 500px; }
-.quiz-box h2#howToPlay { font-size: 1.25rem; margin-bottom: 0.5rem; color: #444; }
-=======
-.quiz-box { 
-    background: white; 
-    padding: 2rem; 
-    border-radius: 10px; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    text-align: center; 
-    width: 100%; 
-    max-width: 500px; 
+.quiz-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
     margin: 0 auto; /* Center the quiz box */
     background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
     backdrop-filter: blur(10px); /* Blur effect for background */
 }
 
->>>>>>> b50dff68f318557c6eaf3256fa7df10510e9ffd9
 /* Current Level Display Style */
 #current-level-display {
     font-size: 1.1rem;
@@ -428,8 +422,30 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     min-height: 100vh;
     position: relative;
+}
+
+/* Center main content area and welcome screen vertically and horizontally */
+#main-content-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin-left: 180px;
+    padding: 2rem;
+    position: relative;
+}
+
+#welcomeScreen {
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    justify-self: center;
+    /* Remove any conflicting margin or centering rules below */
 }
 
 /* Modal system */
