@@ -619,21 +619,66 @@
             }
             // --- End of Core Game Logic Functions ---
 
-            // --- Sound Effects and Music ---
-            // Initializes the Tone.js player for sound effects
-            const soundEffects = {
-                correct: new Tone.Player("assets/sounds/correct.wav").toDestination(),
-                incorrect: new Tone.Player("assets/sounds/incorrect.wav").toDestination(),
-                // click: new Tone.Player("assets/sounds/click.wav").toDestination() // Example for other sounds
-            };
+            // --- Timer Functions ---
+            function startTimer() {
+                const timeLimit = difficultySelect.value === 'hard' ? 20 : 30;
+                timeLeft = timeLimit;
+                timerDisplay.textContent = `Time: ${timeLeft}`;
+                timer = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.textContent = `Time: ${timeLeft}`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        handleTimeout();
+                    }
+                }, 1000);
+            }
 
-            // Function to play a sound effect
+            function resetTimer() {
+                clearInterval(timer);
+            }
+            // --- End of Timer Functions ---
+
+            // --- Animated Sound Effects Setup ---
+            // Get references to audio elements
+            const correctAudio = document.getElementById('correct-sound');
+            const incorrectAudio = document.getElementById('incorrect-sound');
+            const clickAudio = document.getElementById('click-sound');
+            const gameoverAudio = document.getElementById('gameover-sound');
+            const levelupAudio = document.getElementById('levelup-sound');
+
+            // Play sound and animate feedback
             function playSound(soundName) {
-                if (soundEffects[soundName]) {
-                    soundEffects[soundName].start();
+                let audioElem = null;
+                let animateTarget = feedbackDisplay;
+                switch (soundName) {
+                    case 'correct':
+                        audioElem = correctAudio;
+                        gsap.fromTo(animateTarget, { scale: 1 }, { scale: 1.3, yoyo: true, repeat: 1, duration: 0.15, ease: 'power1.inOut' });
+                        break;
+                    case 'incorrect':
+                        audioElem = incorrectAudio;
+                        gsap.fromTo(animateTarget, { x: 0 }, { x: -10, yoyo: true, repeat: 5, duration: 0.05, ease: 'power1.inOut', onComplete: () => gsap.set(animateTarget, { x: 0 }) });
+                        break;
+                    case 'click':
+                        audioElem = clickAudio;
+                        break;
+                    case 'gameover':
+                        audioElem = gameoverAudio;
+                        break;
+                    case 'levelComplete':
+                        audioElem = levelupAudio;
+                        gsap.fromTo(animateTarget, { scale: 1 }, { scale: 1.4, yoyo: true, repeat: 2, duration: 0.18, ease: 'elastic.inOut' });
+                        break;
+                    default:
+                        break;
+                }
+                if (audioElem) {
+                    audioElem.currentTime = 0;
+                    audioElem.play();
                 }
             }
-            // --- End of Sound Effects and Music ---
+            // --- End Animated Sound Effects Setup ---
 
             // --- Utility Functions ---
             // No utility functions were explicitly defined in the original code.
