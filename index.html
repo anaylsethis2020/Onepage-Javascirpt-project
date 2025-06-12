@@ -1,177 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Emoji Quiz Game - Guess the Country</title>
-    
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGwSURBVFhH7ZZNSwJRFIbH/AM6G9G/EIRWQkS/o00Qs6J9m2ohQUSrWhREi6JN0LYgN0GrIBCkRRQIUVFBiwjaqKQG0eI8w1xm7jCOgx/TKvPAy7nn3pm5z9x7Z0bz+XzEJWSTtPCTtsiwtkXR8AE5zPvEasl0p/n8BiWnfLxmkbIEtPteqfCZ48W8g7r0vSRr9cCmVjfHQBmx2ISGDSBaN53FZsqsPvEakFpCMe+YZjr7SvHbM7JYPdQz7uG1D7kQxe5vyHAdk6AxqVgEnzuijHtKeM1hkdti4gb4LyXwGZTg89GbDDAICroclqiHdYoTG3D5Y5RMxAgGdz0UjZ4LBlBi7OwCRusD+TIJSl+uUjp9JRhAiQwG4CJ7IfXgYiwkmPhIXpFXSh/P8Xy9vEn297dJr9cLBjq9QeFx3kBbW4Csn+cUv/ZRanCOPYMBH28A94aC/KviIy6YUE2FeU1IXgpV2LsbQwlx2jAwcJYbD1WeGrzO89qvEOTkYoqcTjbTyg6EoYTkQ6jEKhzoHebDRo3IAMdL4Ot9YxAYtDXZqM3Wx2s2se4HVEHqT6kk9AV/dEX9BJiiDQAAAABJRU5ErkJggg==" />
-    
-    <link rel="stylesheet" href="assets/css/style.css" /> 
-    
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet"> 
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Riddle Quiz</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <!-- External CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Tone.js for audio handling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <!-- Main script -->
+    <script defer src="assets/js/script.js"></script>
 </head>
-
 <body>
-    <audio id="background-music" loop></audio>
-    <audio id="celebration-audio"></audio>
-
-    <aside id="language-sidebar">
-        <h3 data-translate-key="selectLanguage">Select language</h3>
-        <div class="flag-grid">
-            <button class="flag-btn" data-lang="us" title="English"><img src="https://flagcdn.com/w40/us.png" alt="US Flag" /></button>
-            <button class="flag-btn" data-lang="es" title="Español"><img src="https://flagcdn.com/w40/es.png" alt="Spain Flag" /></button>
-            <button class="flag-btn" data-lang="br" title="Português (Brasil)"><img src="https://flagcdn.com/w40/br.png" alt="Brazil Flag" /></button>
-            <button class="flag-btn" data-lang="fr" title="Français"><img src="https://flagcdn.com/w40/fr.png" alt="France Flag" /></button>
-            <button class="flag-btn" data-lang="de" title="Deutsch"><img src="https://flagcdn.com/w40/de.png" alt="Germany Flag" /></button>
-            <button class="flag-btn" data-lang="it" title="Italiano"><img src="https://flagcdn.com/w40/it.png" alt="Italy Flag" /></button>
-            <button class="flag-btn" data-lang="ko" title="한국어"><img src="https://flagcdn.com/w40/kr.png" alt="South Korea Flag" /></button>
-            <button class="flag-btn" data-lang="zh" title="中文"><img src="https://flagcdn.com/w40/cn.png" alt="China Flag" /></button>
-            <button class="flag-btn" data-lang="ja" title="日本語"><img src="https://flagcdn.com/w40/jp.png" alt="Japan Flag" /></button>
-            <button class="flag-btn" data-lang="tr" title="Türkçe"><img src="https://flagcdn.com/w40/tr.png" alt="Turkey Flag" /></button>
-            <button class="flag-btn" data-lang="ar" title="العربية"><img src="https://flagcdn.com/w40/sa.png" alt="Saudi Arabia Flag" /></button>
-            <button class="flag-btn" data-lang="ru" title="Русский"><img src="https://flagcdn.com/w40/ru.png" alt="Russia Flag" /></button>
-            <button class="flag-btn" data-lang="hi" title="हिन्दी (भारत)"><img src="https://flagcdn.com/w40/in.png" alt="India Flag" /></button>
-            <button class="flag-btn" data-lang="ur" title="اردو (پاکستان)"><img src="https://flagcdn.com/w40/pk.png" alt="Pakistan Flag" /></button>
-        </div>
-    </aside>
-
-    <div id="main-content-area">
-        <div id="header-controls">
-            <button id="menu-btn" data-translate-key="menu"> <span>☰</span> </button>
-            <button id="theme-toggle" title="Toggle theme">
-                <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-15.66l-.707.707M4.04 19.96l-.707.707M21 12h-1M4 12H3m15.66 8.66l-.707-.707M4.04 4.04l-.707-.707" /></svg>
-                <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-            </button>
-        </div>
-
-        <section id="welcomeScreen">
-            <h1 data-translate-key="welcomeTitle">Welcome to the Ultimate Emoji Country Quiz!</h1>
-            <input type="text" id="playerName" placeholder="Enter your name" data-translate-placeholder="enterNamePlaceholder" />
-            <input type="number" id="playerAge" placeholder="Enter your age" data-translate-placeholder="enterAgePlaceholder" />
-            <select id="playerGender">
-                <option value="" data-translate-key="selectGender">Select your gender</option>
-                <option value="Male" data-translate-key="male">Male</option>
-                <option value="Female" data-translate-key="female">Female</option>
-                <option value="Other" data-translate-key="other">Other</option>
+    <main id="main-app-content">
+        <!-- Pre-Game Container: Collects user information before starting -->
+        <div id="pre-game-container">
+            <h1>🌍 Emoji Riddle Quiz</h1>
+            <p class="pre-game-subtitle">Guess the country from the emoji riddle!</p>
+            <!-- Input for player's name -->
+            <input type="text" id="name-input" placeholder="Enter your name" required>
+            <!-- Input for player's age -->
+            <input type="number" id="age-input" placeholder="Enter your age" min="1" max="120" required>
+            <!-- Dropdown for player's gender -->
+            <select id="gender-select" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
             </select>
-            <fieldset>
-                <legend data-translate-key="selectDifficulty">Select Difficulty</legend>
-                <div>
-                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy" checked>
-                    <label for="difficultyEasy" data-translate-key="easy">Easy</label>
-                </div>
-                <div>
-                    <input type="radio" id="difficultyMedium" name="difficulty" value="medium">
-                    <label for="difficultyMedium" data-translate-key="medium">Medium</label>
-                </div>
-                <div>
-                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
-                    <label for="difficultyHard" data-translate-key="hard">Hard</label>
-                </div>
-            </fieldset>
-            <button id="continueBtn" data-translate-key="continue">Continue</button>
-        </section>
+            <!-- Button to proceed to instructions -->
+            <button id="continue-button" disabled>Continue</button>
+            <button id="show-about-button" class="about-button-style" style="margin-top: 15px;">💡 About The Game</button>
+        </div>
 
-        <section id="gameScreen" class="hidden">
-            <div class="quiz-box">
-                <div id="current-level-display" data-translate-key="currentLevelPrefix">Current Level: Easy</div>
-                <div class="timer-container">
-                    <svg id="timerDisplay" class="timer-clock" viewBox="0 0 100 100">
-                        <path class="timer-track" d="M 50,50 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"></path>
-                        <path class="timer-progress" d="M 50,50 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0" style="stroke-dasharray: 282.743; stroke-dashoffset: 0;"></path>
-                        <text x="50" y="50" id="timerText">30</text>
-                    </svg>
+        <!-- About Section Container -->
+        <div id="about-container" class="hidden">
+            <h2>🌟 About Emoji Riddle Quiz 🌍</h2>
+            <p>Welcome to the <strong>Emoji Riddle Quiz</strong>, where your guessing prowess is put to the ultimate test! 🚀 Dive into a world where colorful emojis aren't just for texting – they're clues to unlocking country names from around the globe!</p>
+            
+            <p>Each riddle uses a clever combination of emojis that might represent <span class="highlight">words, concepts, or even phonetic sounds</span> related to a specific country. Your mission, should you choose to accept it, is to decipher these visual puzzles and type in the correct country. Think you've got what it takes? 🤔</p>
+            
+            <p>This isn't just a game; it's a brain-boosting adventure! Sharpen your skills in:</p>
+            <ul>
+                <li>🧠 <strong>Memory Recall:</strong> Jog that geography knowledge!</li>
+                <li>⚡ <strong>Quick Thinking:</strong> Decode clues under pressure!</li>
+                <li>✍️ <strong>Spelling Accuracy:</strong> Every letter counts!</li>
+            </ul>
+            
+            <p>Embark on a journey through progressively challenging levels, from <strong>Easy Breezy</strong> to <strong>Brainiac Hard</strong>! Each correct answer brings you closer to becoming an emoji riddle master. 🏆</p>
+            
+            <p>With our <span class="highlight">vibrant visuals and dynamic animations</span>, learning becomes an immersive and playful experience. Keep an eye on your score, challenge your friends, and see who can conquer the emoji world! (Psst... a leaderboard might be on the horizon for ultimate bragging rights! 😉)</p>
+            
+            <p>So, are you ready to flex those mental muscles and have a blast while doing it? Let the emoji riddles begin! 🎉</p>
+            <button id="back-to-pregame-button" class="about-button-style">Back to Game Setup</button>
+        </div>
+
+        <!-- Instructions Container: Displays game rules, example, and difficulty selection -->
+        <div id="instructions-container" class="hidden">
+            <!-- Aircraft Banner Animation Elements -->
+            <div id="aircraft-banner-wrapper">
+                <div id="plane">✈️</div>
+                <div id="banner">
+                    <p id="banner-text">Game instructions will appear here!</p>
                 </div>
-                <h2 id="howToPlay" data-translate-key="instruction">Guess the country using emojis!</h2>
-                 <div id="lives-display-container"> 
-                    <span data-translate-key="livesLeftLabel">Lives Left:</span> <span id="livesLeftDisplay">3</span>
-                </div>
-                <div id="emoji" class="emoji-clue">🔗 + 🅰️</div>
-                <input type="text" id="answerInput" placeholder="Type your answer here..." data-translate-placeholder="typeAnswerPlaceholder" />
+            </div>
+            <h2>Game Instructions</h2>
+            <div style="text-align: left; margin: 0 auto;"> <!-- Removed max-width, handled by container -->
+                <!-- Moved new rules here -->
+                <ul>
+                    <li>🧩 When the game starts, be the first player to decipher the emojis.</li>
+                    <li>⏭️ If you get stuck, press the next button to skip (this will cost a life).</li>
+                </ul>
+                <h3>📋 Game Rules:</h3>
+                <ul>
+                    <!-- <li>🧩 When the game starts, be the first player to decipher the emojis.</li> --> <!-- REMOVED FROM HERE -->
+                    <!-- <li>⏭️ If you get stuck, press the next button to skip (this will cost a life).</li> --> <!-- REMOVED FROM HERE -->
+                    <li>🧠 Decode emoji riddles to guess countries</li>
+                    <li>⏰ You have <span id="time-limit">30</span> seconds per question</li>
+                    <li>❤️ You get 3 lives per game</li>
+                    <li>🎯 Score points for correct answers</li>
+                    <li>🏆 Complete all questions to win!</li>
+                    <li><strong>Hint:</strong> Stuck on a question? Click the "Hint" button! It will provide a clue but will cost you 1 life. The hint button can only be used once per question.</li>
+                </ul>
                 
-                <div class="scores-area">
-                    <p class="score-line">
-                        <strong data-translate-key="gameScorePrefix">Game</strong>:
-                        <span data-translate-key="correctScoreLabel">Correct</span> <span id="overallCorrectScoreDisplay">0</span> |
-                        <span data-translate-key="wrongScoreLabel">Wrong</span> <span id="overallWrongScoreDisplay">0</span>
-                    </p>
-                    <p class="score-line">
-                        <strong data-translate-key="levelScorePrefix">Level (<span id="currentDifficultyNameDisplay">Easy</span>)</strong>:
-                        <span data-translate-key="correctScoreLabel">Correct</span> <span id="levelCorrectScoreDisplay">0</span> |
-                        <span data-translate-key="wrongScoreLabel">Wrong</span> <span id="levelWrongScoreDisplay">0</span>
-                    </p>
-                    <p class="score-line">
-                        <span data-translate-key="playerNameLabel">Player:</span> <span id="playerNameDisplay">Player</span> |
-                        <span data-translate-key="highScoreLabel">High Score:</span> <span id="highScoreDisplay">0</span> </p>
+                <h3>🔍 Example:</h3>
+                <div class="example-box"> <!-- Added class for styling -->
+                    <div class="emoji-example">🇯 🍳</div> <!-- Added class -->
+                    <div class="answer-example">Answer: Japan</div> <!-- Added class -->
+                    <div class="explanation-example">(J + Pan = Japan)</div> <!-- Added class -->
                 </div>
-
-                <div id="feedback"></div>
-
-                <div class="btn-group">
-                    <button id="submitBtn" data-translate-key="submit">Submit</button>
-                    <button id="hintBtn" data-translate-key="hint" class="hidden">💡 Hint</button> 
-                    <button id="nextBtn" data-translate-key="next" class="hidden">Next</button>
-                    <button id="restartLevelBtn" data-translate-key="restartLevel">Restart Level</button>
-                    <button id="restartGameBtn" data-translate-key="restartGame">Restart Full Game</button> 
+                
+                <h3>📊 Difficulty Levels:</h3>
+                <ul>
+                    <li><strong>Easy:</strong> 30 seconds, simpler riddles</li>
+                    <li><strong>Medium:</strong> 30 seconds, moderate riddles</li>
+                    <li><strong>Hard:</strong> 20 seconds, complex riddles</li>
+                </ul>
+            </div>
+            <!-- Dropdown to select game difficulty -->
+            <select id="difficulty-select" required>
+                <option value="" disabled selected>Select Difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <!-- Button to start the game -->
+            <div class="button-group"> <!-- Added for button layout -->
+                <button id="back-button">Back</button> <!-- Moved back button first for natural flow LTR -->
+                <button id="start-button" disabled>Start Game</button>
+            </div>
+        </div>
+        <!-- Game Container: Main area for gameplay -->
+        <div id="game-container" class="hidden">
+            <!-- Top Bar: Displays score, lives, and timer -->
+            <div id="top-bar"> 
+                <div id="score-info-block"> 
+                    <div id="score">Score: 0</div>
+                    <div id="correct-answers">Correct: 0</div>
+                    <div id="incorrect-answers">Incorrect: 0</div>
                 </div>
+                <div id="difficulty-display">Difficulty: </div> 
+                <div id="lives">Lives: ❤️❤️❤️</div>
+                <div id="timer">Time: 30</div>
             </div>
-        </section>
-
-        <footer>
-            <p data-translate-key="footerText">© 2025 Emoji Quiz | Original by Abel Beyene</p>
-        </footer>
-    </div>
-
-    <div id="game-over-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="modal-close-button" id="modal-close">&times;</span>
-            <h2 data-translate-key="gameOverTitle">Game Over!</h2>
-            <p id="game-over-final-message" data-translate-key="gameOverMessage">You've completed all available riddles!</p>
-            <p> 
-                <span data-translate-key="finalScoreLabel">Your final score:</span> <span id="final-score-display">0</span>
-            </p>
-            <button id="modal-play-again-button" data-translate-key="playAgainFromWelcome">Start New Game (from Welcome)</button>
-        </div>
-    </div>
-
-    <div id="level-completion-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="modal-close-button" id="level-completion-modal-close">&times;</span>
-            <div class="victory-stars">
-                <span>⭐</span><span>⭐</span><span>⭐</span>
+            <!-- Riddle Container: Displays emoji clue and question progress -->
+            <div id="riddle-container">
+                <div id="emoji-clue"></div>
+                <div id="question-progress"></div>
             </div>
-            <h2 id="level-completion-title" data-translate-key="levelCompletedTitle">Level Completed!</h2>
-            <p><span class="celebration-emoji">🥳</span></p> 
-            <p id="level-completion-message" data-translate-key="levelCompletedMessageDefault">Well done!</p>
-            <button id="level-completion-next-level-button" data-translate-key="nextLevel">Next Level</button>
-            <button id="level-completion-play-again-button" data-translate-key="playAgainSameLevel">Play Again (Same Level)</button>
+            <!-- Input for player's answer -->
+            <input type="text" id="answer-input" placeholder="Type your answer...">
+            <!-- Game Buttons: Submit answer or move to next question -->
+            <div id="game-buttons">
+                <button id="submit-button">✅ Submit</button>
+                <button id="next-button" class="hidden">⏭️ Next Question</button>
+                <button id="hint-button">💡 Hint</button> 
+                <button id="restart-level-button">🔄 Restart Level</button> 
+                <button id="new-game-from-game-button">🆕 New Game</button> 
+                <button id="exit-game-button">🚪 Exit Game</button> 
+            </div>
+            <!-- Feedback Area: Displays if the answer was correct or incorrect -->
+            <div id="feedback"></div>
         </div>
-    </div>
 
-    <div id="max-attempts-modal" class="modal hidden"> 
-        <div class="modal-content">
-            <span class="modal-close-button" id="max-attempts-modal-close">&times;</span>
-            <h2 data-translate-key="maxAttemptsTitle">Max Attempts Reached</h2>
-            <p data-translate-key="maxAttemptsMessage">You've used all your game attempts. Restart the full game to play again with fresh attempts.</p>
-            <button id="max-attempts-restart-game-button" data-translate-key="restartGame">Restart Full Game</button>
+        <!-- Summary Container: Displays game over message and final score -->
+        <div id="summary-container" class="hidden">
+            <h2>Game Over!</h2>
+            <p id="final-score"></p>
+            <button id="next-level-button" class="summary-button hidden" style="background-color: #28a745; color: white;">Next Level</button>
+            <button id="new-game-button" class="summary-button" style="background-color: #17a2b8; color: white;">Start a New Game </button>
+            <button id="exit-game-summary-button" class="summary-button" style="background-color: #dc3545; color: white;">Exit Game</button>
         </div>
-    </div>
 
-    <div id="game-menu-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="modal-close-button" id="game-menu-modal-close">&times;</span>
-            <h2 data-translate-key="menuTitle">Game Menu</h2>
-            <button id="menu-return-welcome" data-translate-key="menuReturnToWelcome">Return to Welcome</button>
-            <button id="menu-toggle-sound" data-translate-key="menuToggleSound">Sound: ON</button>
-            <button id="menu-toggle-music" data-translate-key="menuToggleMusic">Music: ON</button> 
-        </div>
-    </div>
+    </main>
 
-    <script type="module" src="assets/js/script.js"></script> 
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Abel Beyene - Emoji Riddle Quiz</p>
+    </footer>
 </body>
 </html>

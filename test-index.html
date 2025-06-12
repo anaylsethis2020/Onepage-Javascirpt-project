@@ -7,19 +7,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- GSAP Library -->
     <!-- Start of CSS Styles -->
     <style>
         /* Basic body styling */
         body {
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stack main content and footer vertically */
+            justify-content: space-between; /* Push footer to bottom */
             align-items: center;
             min-height: 100vh;
             margin: 0;
             background-color: #FFF44F; /* Lemon Yellow background */
             color: #000000; /* Black text */
+            overflow-x: hidden; /* Prevent horizontal scrollbars, allow vertical for main content */
+            transition: background-color 1s ease; /* Smooth background color transition */
         }
+
+        #main-app-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%; /* Ensure it takes full width */
+            flex-grow: 1; /* Allow main content to grow and push footer down */
+            overflow-y: auto; /* Allow vertical scrolling for this container */
+            padding: 1em 0; /* Add some padding for scrollable content */
+        }
+
         /* Styling for all main containers (pre-game, game, summary, instructions) */
         #pre-game-container, #game-container, #summary-container, #instructions-container {
             background: #FFFFFF; /* White card background */
@@ -31,6 +47,8 @@
             max-width: 500px;
             border: 1px solid #eef;
             transition: all 0.3s ease;
+            z-index: 1; /* Ensure containers are above the background animations */
+            position: relative; /* Needed for z-index to work */
         }
 
         /* Pre-game container specific styles */
@@ -38,6 +56,16 @@
             font-family: 'Fredoka One', cursive;
             color: #1E90FF; /* Electric Blue */
             margin-bottom: 1em;
+        }
+
+        /* Style for the subtitle in pre-game container */
+        .pre-game-subtitle {
+            font-family: 'Fredoka One', cursive; /* Match main title font */
+            font-size: 1.2em; /* Slightly larger */
+            color: #FF6347; /* Tomato Red - a warm, inviting color */
+            margin-bottom: 1.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow */
+            font-style: normal; /* Remove italic if not desired with this font */
         }
 
         #pre-game-container label {
@@ -54,9 +82,10 @@
             padding: 0.9em;
             margin-bottom: 1em; /* Add margin below each input/select */
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #FF6347; /* Changed border color to Tomato Red */
             font-size: 1em;
             font-family: "Segoe UI", sans-serif;
+            background-color: #eef1f5; /* Reverted to light greyish-blue background */
         }
 
         #pre-game-container input:focus, #pre-game-container select:focus {
@@ -147,10 +176,10 @@
             margin-top: 1em;
             margin-bottom: 1em;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #FF6347; /* Changed border color to Tomato Red */
             font-size: 1em;
             font-family: "Segoe UI", sans-serif;
-            background-color: #FFFFFF; /* White background */
+            background-color: #eef1f5; /* Reverted to light greyish-blue background */
             color: #000000; /* Black text */
         }
 
@@ -201,28 +230,42 @@
             font-size: 1em; /* Adjusted for better fit */
             font-weight: bold; /* Make text bold */
             color: #000000; /* Black text */
+            width: 100%; /* Ensure top-bar takes full width */
         }
 
         #score-info-block {
-            text-align: left; /* Align text to left */
+            display: flex; /* Arrange items horizontally */
+            justify-content: space-around; /* Distribute space around items */
+            width: 100%; /* Ensure the block takes available width */
+            gap: 0.5em; /* Add a small gap between the flex items */
         }
 
         #score-info-block div {
+            flex-grow: 1; /* Allow items to grow and share space */
+            flex-basis: 0; /* Distribute space evenly */
             margin-bottom: 4px; /* Space between score lines */
             font-size: 0.9em;
+            border: 1px solid #000000; /* Black border */
+            padding: 0.5em; /* Adjusted Padding inside the border */
+            border-radius: 8px; /* More rounded corners for the frame */
+            margin-top: 0.3em; /* Space above each framed element */
+            text-align: center; /* Center text within each box */
         }
 
         #score {
             font-size: 1.1em; /* Slightly larger main score */
             color: #000000;
+            background-color: #e0f7fa; /* Light blue background */
         }
 
         #correct-answers {
-            color: #28a745; /* Green for correct answers */
+            color: #155724; /* Darker Green for text for better contrast */
+            background-color: #d4edda; /* Light green background */
         }
 
         #incorrect-answers {
-            color: #dc3545; /* Red for incorrect answers */
+            color: #721c24; /* Darker Red for text for better contrast */
+            background-color: #f8d7da; /* Light red background */
         }
         
         #difficulty-display {
@@ -264,10 +307,11 @@
             padding: 0.9em;
             margin-bottom: 1em;
             border-radius: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #FF6347; /* Changed border color to Tomato Red */
             font-size: 1em;
             font-family: "Segoe UI", sans-serif;
             text-align: center; /* Center placeholder and input text */
+            background-color: #eef1f5; /* Reverted to light greyish-blue background */
         }
         #answer-input:focus {
             border-color: #1E90FF; /* Electric Blue */
@@ -283,35 +327,42 @@
         }
 
         #game-buttons button {
-            padding: 0.8em; /* Adjust padding for game buttons */
-            font-size: 0.9em; /* Adjust font size for game buttons */
+            padding: 0.8em 1.2em; /* Adjusted padding */
+            font-size: 0.9em;
             font-weight: bold;
-            width: 100%; /* Make buttons fill grid cells */
-            margin: 0; /* Reset margin if any from general button style */
+            width: 100%;
+            margin: 0;
+            font-family: "Segoe UI", sans-serif; /* Explicitly set font */
+            color: #FFFFFF; /* White text */
+            background-color: #FF6347; /* Tomato Red background */
+            border: none; /* Remove borders */
+            border-radius: 25px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+            transition: all 0.2s ease-in-out; /* Smooth transition for hover/active */
         }
 
-        /* Specific button colors - using existing inline styles as base, can be moved here */
-        #submit-button, #next-button {
-            background-color: #1E90FF; /* Electric Blue */
-            color: #FFFFFF;
+        /* Ensure hover/active effects from general button styles still work well */
+        #game-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        #hint-button {
-            background-color: #fd7e14; /* Orange - keep or change to theme? */
-            color: #FFFFFF;
+
+        #game-buttons button:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
-        #restart-level-button {
-            background-color: #FFF44F; /* Lemon Yellow for highlight */
-            color: #000000; /* Black text for contrast */
-            border: 1px solid #1E90FF; /* Optional: Blue border */
+
+        /* Individual Game Button Colors */
+        #submit-button { background-color: #28a745; /* Green */ }
+        #next-button { background-color: #007bff; /* Blue */ }
+        #hint-button { background-color: #fd7e14; /* Orange */ }
+        #restart-level-button { 
+            background-color: #ffc107; /* Yellow */
+            color: #212529; /* Dark text for better contrast on yellow */
         }
-        #new-game-from-game-button {
-            background-color: #17a2b8; /* Teal - keep or change to theme? */
-            color: #FFFFFF;
-        }
-        #exit-game-button {
-            background-color: #dc3545; /* Red - keep or change to theme? */
-            color: #FFFFFF;
-        }
+        #new-game-from-game-button { background-color: #17a2b8; /* Teal */ }
+        #exit-game-button { background-color: #1E90FF; /* Electric Blue */ }
+
 
         /* Styling for the feedback message display */
         #feedback {
@@ -348,122 +399,342 @@
             width: auto; /* Auto width based on content */
             padding: 8px 12px;
             border-radius: 50px; /* Circular button */
+            z-index: 1000; /* Ensure music toggle is above animations */
+        }
+
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 0.05em 0; /* Reduced padding */
+            margin-top: auto; /* Pushes footer to the bottom if content is short */
+            font-size: 1em; /* Increased font size */
+            font-weight: bold; /* Added boldness */
+            color: #555;
+            border-top: 3px solid #000000; /* Thick black border */
+            background-color: #FFFFFF; /* White background for footer */
+            width: 100%; /* Make footer span full width */
+            z-index: 1; /* Ensure footer is above the background animations */
+            position: relative; /* Needed for z-index to work */
+        }
+
+        /* Styles for animated emojis */
+        .floating-emoji {
+            position: fixed; /* Changed to fixed to float over all content */
+            font-size: 2em; /* Adjust size as needed */
+            user-select: none; /* Prevent selection */
+            z-index: 0; /* Behind content but above background */
+            opacity: 0; /* Start invisible for fade-in */
+        }
+
+        /* Styles for summary buttons */
+        .summary-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white; /* Default text color */
+            cursor: pointer;
+            margin: 10px auto; /* 10px top/bottom, auto left/right for centering */
+            text-align: center;
+            display: block; /* Allows for width and margin:auto centering */
+            width: 70%;     /* Percentage of its container's width */
+            max-width: 300px; /* Maximum width to prevent buttons from becoming too large */
+            transition: opacity 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+        }
+
+        .summary-button:hover {
+            opacity: 0.85; /* Slight fade on hover */
+            transform: translateY(-2px); /* Subtle lift effect on hover */
+        }
+
+        /* About Section Styles */
+        #about-container {
+            background-color: rgba(255, 255, 255, 0.95); /* Light, slightly transparent background */
+            color: #333; /* Darker text for readability */
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            text-align: center; /* Center align the content */
+            margin: 20px auto;
+            max-width: 700px; /* Max width for better readability */
+            border: 2px solid #FFD700; /* Gold border */
+            z-index: 1; /* Ensure it's above background animations */
+            position: relative;
+        }
+
+        #about-container h2 {
+            color: #1E90FF; /* Blue heading */
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #about-container p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            text-align: left; /* Align paragraphs to the left for readability */
+            color: #555; /* Slightly lighter text color for paragraphs */
+        }
+
+        #about-container strong {
+            color: #32CD32; /* Green for emphasis */
+        }
+
+        #about-container .highlight {
+            color: #FF4500; /* Red for other highlights */
+            font-weight: bold;
+        }
+
+        #about-container ul {
+            list-style-type: none; /* Remove default bullets */
+            padding-left: 0;
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        #about-container ul li {
+            padding-left: 1.5em;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        #about-container ul li::before {
+            content: '🌟'; /* Star emoji as bullet */
+            position: absolute;
+            left: 0;
+            font-size: 1em;
+        }
+
+        .about-button-style {
+            background-color: #17a2b8; /* Teal background color */
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Space above the button */
+        }
+
+        .about-button-style:hover {
+            background-color: #138496; /* Darker teal on hover */
+        }
+
+        /* Aircraft Banner Styles */
+        #aircraft-banner-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100px; /* Fixed height for the banner */
+            overflow: hidden;
+            margin-bottom: 1.5em; /* Space below the banner */
+        }
+
+        #plane {
+            position: absolute;
+            top: 10px; /* Adjusted vertical position */
+            left: 0;
+            font-size: 2.5em;
+            animation: fly 10s linear infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(-100px) rotate(0deg); }
+            100% { transform: translateX(100vw) rotate(360deg); }
+        }
+
+        #banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1;
+        }
+
+        #banner-text {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1.2em;
+            color: #333;
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #aircraft-banner-wrapper {
+                height: 80px; /* Reduced height on smaller screens */
+            }
+
+            #plane {
+                font-size: 2em;
+            }
+
+            #banner {
+                padding: 8px 16px;
+            }
+
+            #banner-text {
+                font-size: 1em;
+            }
         }
     </style>
-    <!-- End of CSS Styles -->
 </head>
 <body>
-    <!-- Pre-Game Container: Collects user information before starting -->
-    <div id="pre-game-container">
-        <h1>🌍 Emoji Riddle Quiz</h1>
-        <p>Guess the country from the emoji riddle!</p>
-        <!-- Input for player's name -->
-        <input type="text" id="name-input" placeholder="Enter your name" required>
-        <!-- Input for player's age -->
-        <input type="number" id="age-input" placeholder="Enter your age" min="1" max="120" required>
-        <!-- Dropdown for player's gender -->
-        <select id="gender-select" required>
-            <option value="" disabled selected>Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="non-binary">Non-binary</option>
-            <option value="prefer-not-to-say">Prefer not to say</option>
-        </select>
-        <!-- Button to proceed to instructions -->
-        <button id="continue-button" disabled>Continue</button>
-    </div>
+    <main id="main-app-content">
+        <!-- Pre-Game Container: Collects user information before starting -->
+        <div id="pre-game-container">
+            <h1>🌍 Emoji Riddle Quiz</h1>
+            <p class="pre-game-subtitle">Guess the country from the emoji riddle!</p>
+            <!-- Input for player's name -->
+            <input type="text" id="name-input" placeholder="Enter your name" required>
+            <!-- Input for player's age -->
+            <input type="number" id="age-input" placeholder="Enter your age" min="1" max="120" required>
+            <!-- Dropdown for player's gender -->
+            <select id="gender-select" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non-binary">Non-binary</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+            <!-- Button to proceed to instructions -->
+            <button id="continue-button" disabled>Continue</button>
+            <button id="show-about-button" class="about-button-style" style="margin-top: 15px;">💡 About The Game</button>
+        </div>
 
-    <!-- Instructions Container: Displays game rules, example, and difficulty selection -->
-    <div id="instructions-container" class="hidden">
-        <h2>🎯 How to Play</h2>
-        <div style="text-align: left; margin: 0 auto;"> <!-- Removed max-width, handled by container -->
-            <!-- Moved new rules here -->
+        <!-- About Section Container -->
+        <div id="about-container" class="hidden">
+            <h2>🌟 About Emoji Riddle Quiz 🌍</h2>
+            <p>Welcome to the <strong>Emoji Riddle Quiz</strong>, where your guessing prowess is put to the ultimate test! 🚀 Dive into a world where colorful emojis aren't just for texting – they're clues to unlocking country names from around the globe!</p>
+            
+            <p>Each riddle uses a clever combination of emojis that might represent <span class="highlight">words, concepts, or even phonetic sounds</span> related to a specific country. Your mission, should you choose to accept it, is to decipher these visual puzzles and type in the correct country. Think you've got what it takes? 🤔</p>
+            
+            <p>This isn't just a game; it's a brain-boosting adventure! Sharpen your skills in:</p>
             <ul>
-                <li>🧩 When the game starts, be the first player to decipher the emojis.</li>
-                <li>⏭️ If you get stuck, press the next button to skip (this will cost a life).</li>
-            </ul>
-            <h3>📋 Game Rules:</h3>
-            <ul>
-                <!-- <li>🧩 When the game starts, be the first player to decipher the emojis.</li> --> <!-- REMOVED FROM HERE -->
-                <!-- <li>⏭️ If you get stuck, press the next button to skip (this will cost a life).</li> --> <!-- REMOVED FROM HERE -->
-                <li>🧠 Decode emoji riddles to guess countries</li>
-                <li>⏰ You have <span id="time-limit">30</span> seconds per question</li>
-                <li>❤️ You get 3 lives per game</li>
-                <li>🎯 Score points for correct answers</li>
-                <li>🏆 Complete all questions to win!</li>
-                <li><strong>Hint:</strong> Stuck on a question? Click the "Hint" button! It will provide a clue but will cost you 1 life. The hint button can only be used once per question.</li>
+                <li>🧠 <strong>Memory Recall:</strong> Jog that geography knowledge!</li>
+                <li>⚡ <strong>Quick Thinking:</strong> Decode clues under pressure!</li>
+                <li>✍️ <strong>Spelling Accuracy:</strong> Every letter counts!</li>
             </ul>
             
-            <h3>🔍 Example:</h3>
-            <div class="example-box"> <!-- Added class for styling -->
-                <div class="emoji-example">🇯 🍳</div> <!-- Added class -->
-                <div class="answer-example">Answer: Japan</div> <!-- Added class -->
-                <div class="explanation-example">(J + Pan = Japan)</div> <!-- Added class -->
-            </div>
+            <p>Embark on a journey through progressively challenging levels, from <strong>Easy Breezy</strong> to <strong>Brainiac Hard</strong>! Each correct answer brings you closer to becoming an emoji riddle master. 🏆</p>
             
-            <h3>📊 Difficulty Levels:</h3>
-            <ul>
-                <li><strong>Easy:</strong> 30 seconds, simpler riddles</li>
-                <li><strong>Medium:</strong> 30 seconds, moderate riddles</li>
-                <li><strong>Hard:</strong> 20 seconds, complex riddles</li>
-            </ul>
+            <p>With our <span class="highlight">vibrant visuals and dynamic animations</span>, learning becomes an immersive and playful experience. Keep an eye on your score, challenge your friends, and see who can conquer the emoji world! (Psst... a leaderboard might be on the horizon for ultimate bragging rights! 😉)</p>
+            
+            <p>So, are you ready to flex those mental muscles and have a blast while doing it? Let the emoji riddles begin! 🎉</p>
+            <button id="back-to-pregame-button" class="about-button-style">Back to Game Setup</button>
         </div>
-        <!-- Dropdown to select game difficulty -->
-        <select id="difficulty-select" required>
-            <option value="" disabled selected>Select Difficulty</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <!-- Button to start the game -->
-        <div class="button-group"> <!-- Added for button layout -->
-            <button id="back-button">Back</button> <!-- Moved back button first for natural flow LTR -->
-            <button id="start-button" disabled>Start Game</button>
-        </div>
-    </div>
-    <!-- Game Container: Main area for gameplay -->
-    <div id="game-container" class="hidden">
-        <!-- Top Bar: Displays score, lives, and timer -->
-        <div id="top-bar"> 
-            <div id="score-info-block"> 
-                <div id="score">Score: 0</div>
-                <div id="correct-answers">Correct: 0</div>
-                <div id="incorrect-answers">Incorrect: 0</div>
+
+        <!-- Instructions Container: Displays game rules, example, and difficulty selection -->
+        <div id="instructions-container" class="hidden">
+            <!-- Aircraft Banner Animation Elements -->
+            <div id="aircraft-banner-wrapper">
+                <div id="plane">✈️</div>
+                <div id="banner">
+                    <p id="banner-text">Game instructions will appear here!</p>
+                </div>
             </div>
-            <div id="difficulty-display">Difficulty: </div> 
-            <div id="lives">Lives: ❤️❤️❤️</div>
-            <div id="timer">Time: 30</div>
+            <h2>Game Instructions</h2>
+            <div style="text-align: left; margin: 0 auto;"> <!-- Removed max-width, handled by container -->
+                <!-- Moved new rules here -->
+                <ul>
+                    <li>🧩 When the game starts, be the first player to decipher the emojis.</li>
+                    <li>⏭️ If you get stuck, press the next button to skip (this will cost a life).</li>
+                </ul>
+                <h3>📋 Game Rules:</h3>
+                <ul>
+                    <!-- <li>🧩 When the game starts, be the first player to decipher the emojis.</li> --> <!-- REMOVED FROM HERE -->
+                    <!-- <li>⏭️ If you get stuck, press the next button to skip (this will cost a life).</li> --> <!-- REMOVED FROM HERE -->
+                    <li>🧠 Decode emoji riddles to guess countries</li>
+                    <li>⏰ You have <span id="time-limit">30</span> seconds per question</li>
+                    <li>❤️ You get 3 lives per game</li>
+                    <li>🎯 Score points for correct answers</li>
+                    <li>🏆 Complete all questions to win!</li>
+                    <li><strong>Hint:</strong> Stuck on a question? Click the "Hint" button! It will provide a clue but will cost you 1 life. The hint button can only be used once per question.</li>
+                </ul>
+                
+                <h3>🔍 Example:</h3>
+                <div class="example-box"> <!-- Added class for styling -->
+                    <div class="emoji-example">🇯 🍳</div> <!-- Added class -->
+                    <div class="answer-example">Answer: Japan</div> <!-- Added class -->
+                    <div class="explanation-example">(J + Pan = Japan)</div> <!-- Added class -->
+                </div>
+                
+                <h3>📊 Difficulty Levels:</h3>
+                <ul>
+                    <li><strong>Easy:</strong> 30 seconds, simpler riddles</li>
+                    <li><strong>Medium:</strong> 30 seconds, moderate riddles</li>
+                    <li><strong>Hard:</strong> 20 seconds, complex riddles</li>
+                </ul>
+            </div>
+            <!-- Dropdown to select game difficulty -->
+            <select id="difficulty-select" required>
+                <option value="" disabled selected>Select Difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <!-- Button to start the game -->
+            <div class="button-group"> <!-- Added for button layout -->
+                <button id="back-button">Back</button> <!-- Moved back button first for natural flow LTR -->
+                <button id="start-button" disabled>Start Game</button>
+            </div>
         </div>
-        <!-- Riddle Container: Displays emoji clue and question progress -->
-        <div id="riddle-container">
-            <div id="emoji-clue"></div>
-            <div id="question-progress"></div>
+        <!-- Game Container: Main area for gameplay -->
+        <div id="game-container" class="hidden">
+            <!-- Top Bar: Displays score, lives, and timer -->
+            <div id="top-bar"> 
+                <div id="score-info-block"> 
+                    <div id="score">Score: 0</div>
+                    <div id="correct-answers">Correct: 0</div>
+                    <div id="incorrect-answers">Incorrect: 0</div>
+                </div>
+                <div id="difficulty-display">Difficulty: </div> 
+                <div id="lives">Lives: ❤️❤️❤️</div>
+                <div id="timer">Time: 30</div>
+            </div>
+            <!-- Riddle Container: Displays emoji clue and question progress -->
+            <div id="riddle-container">
+                <div id="emoji-clue"></div>
+                <div id="question-progress"></div>
+            </div>
+            <!-- Input for player's answer -->
+            <input type="text" id="answer-input" placeholder="Type your answer...">
+            <!-- Game Buttons: Submit answer or move to next question -->
+            <div id="game-buttons">
+                <button id="submit-button">✅ Submit</button>
+                <button id="next-button" class="hidden">⏭️ Next Question</button>
+                <button id="hint-button">💡 Hint</button> 
+                <button id="restart-level-button">🔄 Restart Level</button> 
+                <button id="new-game-from-game-button">🆕 New Game</button> 
+                <button id="exit-game-button">🚪 Exit Game</button> 
+            </div>
+            <!-- Feedback Area: Displays if the answer was correct or incorrect -->
+            <div id="feedback"></div>
         </div>
-        <!-- Input for player's answer -->
-        <input type="text" id="answer-input" placeholder="Type your answer...">
-        <!-- Game Buttons: Submit answer or move to next question -->
-        <div id="game-buttons">
-            <button id="submit-button">Submit</button>
-            <button id="next-button" class="hidden">Next Question</button>
-            <button id="hint-button">Hint</button> 
-            <button id="restart-level-button">Restart Level</button> 
-            <button id="new-game-from-game-button">New Game</button> 
-            <button id="exit-game-button">Exit Game</button> 
-        </div>
-        <!-- Feedback Area: Displays if the answer was correct or incorrect -->
-        <div id="feedback"></div>
-    </div>
 
-    <!-- Summary Container: Displays game over message and final score -->
-    <div id="summary-container" class="hidden">
-        <h2>Game Over!</h2>
-        <p id="final-score"></p>
-        <button id="next-level-button" class="hidden" style="background-color: #28a745; color: white; margin-bottom: 10px;">Next Level</button> <!-- Added Next Level button -->
-        <button id="new-game-button" style="background-color: #17a2b8;">Start a New Game </button> <!-- New Game Button -->
-    </div>
+        <!-- Summary Container: Displays game over message and final score -->
+        <div id="summary-container" class="hidden">
+            <h2>Game Over!</h2>
+            <p id="final-score"></p>
+            <button id="next-level-button" class="summary-button hidden" style="background-color: #28a745; color: white;">Next Level</button>
+            <button id="new-game-button" class="summary-button" style="background-color: #17a2b8; color: white;">Start a New Game </button>
+            <button id="exit-game-summary-button" class="summary-button" style="background-color: #dc3545; color: white;">Exit Game</button>
+        </div>
 
-    <!-- Music Toggle Button: Allows user to turn music on/off -->
-    <button id="music-toggle">🎵 Sound: OFF</button>
+        <!-- Music Toggle Button: Allows user to turn music on/off -->
+        <button id="music-toggle">🎵 Sound: OFF</button>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Abel Beyene - Emoji Riddle Quiz</p>
+    </footer>
 
     <!-- External library for sound effects (Tone.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
@@ -520,6 +791,12 @@
             const finalScoreDisplay = document.getElementById('final-score');
             const newGameButton = document.getElementById('new-game-button'); 
             const nextLevelButton = document.getElementById('next-level-button'); // Added Next Level button
+            const exitGameSummaryButton = document.getElementById('exit-game-summary-button'); // Added Exit Game button for summary
+
+            // Get reference to about container and buttons
+            const aboutContainer = document.getElementById('about-container');
+            const showAboutButton = document.getElementById('show-about-button');
+            const backToPreGameButton = document.getElementById('back-to-pregame-button');
             // --- End of DOM Element Selections ---
 
             // --- Question Bank ---
@@ -567,6 +844,122 @@
             let isMusicPlaying = false; // Flag to track music state
             let hintUsedThisQuestion = false; // Flag to track if hint was used for the current question
             // --- End of Game State Variables ---
+
+            // --- Animation Setup ---
+            const backgroundColors = ['#FFD700', '#1E90FF', '#32CD32', '#FF4500']; // Gold, Blue, Green, Red
+            let currentColorIndex = 0;
+
+            function changeBackgroundColor() {
+                currentColorIndex = (currentColorIndex + 1) % backgroundColors.length;
+                document.body.style.backgroundColor = backgroundColors[currentColorIndex];
+            }
+            setInterval(changeBackgroundColor, 5000); // Change color every 5 seconds
+
+            const flagEmojis = ['🇺🇸', '🇧🇷', '🇯🇵', '🇫🇷', '🇨🇳', '🇬🇧', '🇮🇳', '🇨🇦', '🇦🇺', '🇩🇪'];
+            const generalEmojis = ['😀', '🎉', '🌟', '🚀', '💡', '🎯', '🏆', '🧩', '🧠', '⏰'];
+            const allEmojisForRain = [...flagEmojis, ...generalEmojis];
+
+            function createFloatingEmoji() {
+                const emoji = document.createElement('div');
+                emoji.classList.add('floating-emoji');
+                emoji.textContent = flagEmojis[Math.floor(Math.random() * flagEmojis.length)];
+                document.body.appendChild(emoji);
+
+                // Random starting position and animation properties
+                const startX = Math.random() * window.innerWidth;
+                const startY = window.innerHeight + 50; // Start below the screen
+                const endY = -100; // End above the screen
+                const duration = Math.random() * 5 + 5; // 5-10 seconds duration
+                const delay = Math.random() * 3; // Stagger appearance
+
+                gsap.set(emoji, { x: startX, y: startY, opacity: 0 });
+                gsap.to(emoji, {
+                    y: endY,
+                    opacity: [0.8, 1, 0.8, 0], // Fade in, stay, fade out
+                    duration: duration,
+                    delay: delay,
+                    ease: "power1.inOut",
+                    onComplete: () => {
+                        emoji.remove(); // Remove emoji from DOM after animation
+                    }
+                });
+            }
+
+            // Create floating emojis at intervals
+            // Adjust interval for more or fewer emojis
+            setInterval(createFloatingEmoji, 2000); // Create a new floating emoji every 2 seconds
+
+
+            function createFallingEmoji() {
+                const emoji = document.createElement('div');
+                emoji.classList.add('floating-emoji'); // Can reuse some styling
+                emoji.textContent = allEmojisForRain[Math.floor(Math.random() * allEmojisForRain.length)];
+                emoji.style.fontSize = `${Math.random() * 1.5 + 1}em`; // Random size (1em to 2.5em)
+                document.body.appendChild(emoji);
+
+                let startX, startY, endX, endY;
+                const sideRoll = Math.random();
+
+                if (sideRoll < 0.6) { // 60% chance: Start from Top
+                    startX = Math.random() * window.innerWidth;
+                    startY = -50; // Start above screen
+                    // Emojis from top fall mostly downwards, with a horizontal drift
+                    endX = startX + (Math.random() - 0.5) * (window.innerWidth / 4); 
+                    endY = window.innerHeight + 50; // End below screen
+                    // Ensure endX is within reasonable screen bounds
+                    endX = Math.max(-100, Math.min(window.innerWidth + 100, endX));
+                } else if (sideRoll < 0.8) { // 20% chance: Start from Left
+                    startX = -50; // Start left of screen
+                    startY = Math.random() * window.innerHeight; // Random height on the left edge
+                    // Emojis from left fall diagonally towards the bottom right area
+                    endX = Math.random() * (window.innerWidth / 2) + (window.innerWidth / 2); // Target right half
+                    endY = window.innerHeight + 50; // End below screen
+                } else { // 20% chance: Start from Right
+                    startX = window.innerWidth + 50; // Start right of screen
+                    startY = Math.random() * window.innerHeight; // Random height on the right edge
+                    // Emojis from right fall diagonally towards the bottom left area
+                    endX = Math.random() * (window.innerWidth / 2); // Target left half
+                    endY = window.innerHeight + 50; // End below screen
+                }
+
+                const duration = Math.random() * 5 + 6; // Duration 6-11 seconds
+                const rotation = Math.random() * 360 - 180; // Random rotation
+
+                gsap.set(emoji, { x: startX, y: startY, opacity: 1, rotation: 0 });
+                gsap.to(emoji, {
+                    x: endX, // Animate x-coordinate
+                    y: endY, // Animate y-coordinate
+                    rotation: rotation,
+                    opacity: 0,
+                    duration: duration,
+                    ease: "power1.in", // Emojis accelerate as they fall
+                    onComplete: () => {
+                        emoji.remove();
+                    }
+                });
+            }
+
+            function startEmojiRain() {
+                createFallingEmoji();
+                requestAnimationFrame(startEmojiRain);
+            }
+
+            // Start the emoji rain - call it once to begin the loop
+            // To control the density, you might want to call createFallingEmoji on an interval
+            // instead of every frame, or add a conditional check inside startEmojiRain.
+            // For now, let's create one every few frames for a less dense effect.
+            let frameCount = 0;
+            function controlledEmojiRain() {
+                frameCount++;
+                if (frameCount % 10 === 0) { // Create an emoji roughly every 10 frames
+                    createFallingEmoji();
+                }
+                requestAnimationFrame(controlledEmojiRain);
+            }
+            controlledEmojiRain(); // Start the controlled rain
+
+            // --- End of Animation Setup ---
+
 
             // --- Form Validation Functions ---
             // Validates the pre-game form (name, age, gender)
@@ -620,13 +1013,26 @@
             
             newGameButton.addEventListener('click', returnToInstructions); // Added listener for new game (back to instructions)
             nextLevelButton.addEventListener('click', startNextLevel); // Added listener for next level
+            exitGameSummaryButton.addEventListener('click', exitToPreGameFromSummary); // Listener for Exit Game from Summary
             musicToggleButton.addEventListener('click', toggleMusic);   // Toggle background music
+
+            // About section button listeners
+            showAboutButton.addEventListener('click', () => {
+                preGameContainer.classList.add('hidden');
+                aboutContainer.classList.remove('hidden');
+            });
+
+            backToPreGameButton.addEventListener('click', () => {
+                aboutContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+            });
             // --- End of Event Listeners ---
 
             // --- Navigation Functions ---
             // Shows the instructions screen and hides the pre-game screen
             function showInstructions() {
                 preGameContainer.classList.add('hidden');
+                aboutContainer.classList.add('hidden'); // Ensure about is hidden too
                 instructionsContainer.classList.remove('hidden');
                 validateInstructionsForm(); // Ensure start button state is correct on show
             }
@@ -662,6 +1068,18 @@
                 // Reset pre-game form fields for a clean start
                 nameInput.value = '';
                 ageInput.value = '';
+                genderSelect.value = '';
+                validatePreGameForm(); // Update continue button state based on cleared form
+            }
+
+            // Exits the game from the summary screen and returns to the pre-game screen
+            function exitToPreGameFromSummary() {
+                summaryContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden
+
+                // Reset pre-game form fields for a clean start
+                nameInput.value = '';
                 genderSelect.value = '';
                 validatePreGameForm(); // Update continue button state based on cleared form
             }

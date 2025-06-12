@@ -1,1052 +1,649 @@
-/**
- * ============================================================================
- * IMPORTS & CONFIGURATION
- * ============================================================================
- * 
- * This section handles all external dependencies and initial setup.
- * Firebase is used for:
- * - User authentication (anonymous sign-in)
- * - Storing high scores
- * - Tracking game attempts
- * - Offline mode fallback
- */
+// Event listener to ensure the DOM is fully loaded before running script
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selections ---
+            // Get references to all main containers
+            const preGameContainer = document.getElementById('pre-game-container');
+            const instructionsContainer = document.getElementById('instructions-container');
+            const gameContainer = document.getElementById('game-container');
+            const summaryContainer = document.getElementById('summary-container');
 
-// Firebase imports for core functionality
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+            // Initial visibility setup: Show pre-game, hide others
+            preGameContainer.classList.remove('hidden');
+            instructionsContainer.classList.add('hidden');
+            gameContainer.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
 
-/**
- * Firebase Configuration
- * This configuration object connects the game to your Firebase project.
- * Required for:
- * - User authentication
- * - Score persistence
- * - Game state synchronization
- * 
- * Replace these placeholder values with your actual Firebase project configuration
- * from the Firebase Console (https://console.firebase.google.com)
- */
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+            // Get references to pre-game form elements
+            const nameInput = document.getElementById('name-input');
+            const ageInput = document.getElementById('age-input');
+            const genderSelect = document.getElementById('gender-select');
+            const continueButton = document.getElementById('continue-button');
 
-// Initialize Firebase services
-// These instances are used throughout the game for various Firebase operations
-const app = initializeApp(firebaseConfig);
-const fbAuth = getAuth(app);  // Used for user authentication
-const db = getFirestore(app); // Used for storing game data
+            // Get references to instructions screen elements
+            const difficultySelect = document.getElementById('difficulty-select');
+            const startButton = document.getElementById('start-button');
+            const backButton = document.getElementById('back-button');
 
-// Set Firebase log level to reduce console noise
-setLogLevel('error');
+            // Get references to game screen elements
+            const scoreDisplay = document.getElementById('score');
+            const correctAnswersDisplay = document.getElementById('correct-answers'); // Added for correct count
+            const incorrectAnswersDisplay = document.getElementById('incorrect-answers'); // Added for incorrect count
+            const difficultyDisplay = document.getElementById('difficulty-display'); // Added difficulty display
+            const livesDisplay = document.getElementById('lives');
+            const timerDisplay = document.getElementById('timer');
+            const emojiClueDisplay = document.getElementById('emoji-clue');
+            const questionProgressDisplay = document.getElementById('question-progress');
+            const answerInput = document.getElementById('answer-input');
+            const submitButton = document.getElementById('submit-button');
+            const nextButton = document.getElementById('next-button');
+            const feedbackDisplay = document.getElementById('feedback');
+            const restartLevelButton = document.getElementById('restart-level-button'); 
+            const newGameFromGameButton = document.getElementById('new-game-from-game-button'); 
+            const hintButton = document.getElementById('hint-button'); // Added Hint button
+            const exitGameButton = document.getElementById('exit-game-button'); // Added Exit Game button
 
-/**
- * Firebase state variables
- * These track the authentication state and are used by:
- * - Score saving/loading functions
- * - User session management
- * - Offline mode detection
- */
-let currentUserId = null;  // Stores the current user's Firebase ID
-let isAuthReady = false;   // Tracks if Firebase auth is initialized
+            // Get references to summary screen elements
+            const finalScoreDisplay = document.getElementById('final-score');
+            const newGameButton = document.getElementById('new-game-button'); 
+            const nextLevelButton = document.getElementById('next-level-button'); // Added Next Level button
+            const exitGameSummaryButton = document.getElementById('exit-game-summary-button'); // Added Exit Game button for summary
 
-/**
- * ============================================================================
- * LANGUAGE & TRANSLATIONS
- * ============================================================================
- * 
- * This section manages the game's internationalization (i18n) system.
- * The translation system:
- * - Supports multiple languages
- * - Updates UI elements dynamically
- * - Persists language selection
- * - Provides fallback to English
- */
+            // Get reference to about container and buttons
+            const aboutContainer = document.getElementById('about-container');
+            const showAboutButton = document.getElementById('show-about-button');
+            const backToPreGameButton = document.getElementById('back-to-pregame-button');
+            // --- End of DOM Element Selections ---
 
-/**
- * Translation dictionary for all supported languages
- * Each language has its own set of translations for UI elements.
- * The structure is:
- * {
- *   languageCode: {
- *     key: "translated text",
- *     ...
- *   }
- * }
- * 
- * Used by:
- * - applyTranslations() function
- * - UI update functions
- * - Feedback messages
- */
-const translations = {
-    us: {
-        selectLanguage: "Select language",
-        welcomeTitle: "Welcome to the Ultimate Emoji Country Quiz!",
-        enterNamePlaceholder: "Enter your name",
-        enterAgePlaceholder: "Enter your age",
-        selectGender: "Select your gender",
-        male: "Male",
-        female: "Female",
-        other: "Other",
-        selectDifficulty: "Select Difficulty",
-        easy: "Easy",
-        medium: "Medium",
-        hard: "Hard",
-        continue: "Continue",
-        currentLevelPrefix: "Current Level:",
-        livesLeftLabel: "Lives Left:",
-        instruction: "Guess the country using emojis!",
-        typeAnswerPlaceholder: "Type your answer here...",
-        gameScorePrefix: "Game",
-        correctScoreLabel: "Correct",
-        wrongScoreLabel: "Wrong",
-        levelScorePrefix: "Level",
-        playerNameLabel: "Player:",
-        highScoreLabel: "High Score:",
-        submit: "Submit",
-        hint: "💡 Hint",
-        next: "Next",
-        restartLevel: "Restart Level",
-        restartGame: "Restart Full Game",
-        gameOverTitle: "Game Over!",
-        gameOverMessage: "You've completed all available riddles!",
-        finalScoreLabel: "Your final score:",
-        playAgainFromWelcome: "Start New Game (from Welcome)",
-        levelCompletedTitle: "Level Completed!",
-        levelCompletedMessageDefault: "Well done!",
-        nextLevel: "Next Level",
-        playAgainSameLevel: "Play Again (Same Level)",
-        maxAttemptsTitle: "Max Attempts Reached",
-        maxAttemptsMessage: "You've used all your game attempts. Restart the full game to play again with fresh attempts.",
-        menuTitle: "Game Menu",
-        menuReturnToWelcome: "Return to Welcome",
-        menuToggleSound: "Sound: ON",
-        menuToggleMusic: "Music: ON",
-        footerText: "© 2025 Emoji Quiz | Original by Abel Beyene"
-    }
-};
+            // --- Question Bank ---
+            // Object containing questions categorized by difficulty
+            const questions = {
+                easy: [
+                    { emoji: "🇯 🍳", answer: "japan", hint: "Island nation in East Asia, capital is Tokyo." },
+                    { emoji: "👙💤🤧", answer: "brazil", hint: "Largest country in South America, famous for samba." },
+                    { emoji: "🔗🅰️", answer: "china", hint: "Most populous country, known for the Great Wall." },
+                    { emoji: "4️⃣🐜🐜", answer: "france", hint: "European country, home to the Eiffel Tower." },
+                    { emoji: "🍐🦘", answer: "peru", hint: "South American country, site of Machu Picchu." }
+                ],
+                medium: [
+                    { emoji: "🧊🅰️", answer: "cuba", hint: "Caribbean island nation, capital Havana." },
+                    { emoji: "🍳🅰️🤰", answer: "panama", hint: "Connects North and South America, has a famous canal." },
+                    { emoji: "🐄🪨🅾️", answer: "morocco", hint: "North African kingdom, borders the Atlantic and Mediterranean." },
+                    { emoji: "🐋🐬", answer: "wales", hint: "Part of the United Kingdom, known for its castles." },
+                    { emoji: "👖✅", answer: "denmark", hint: "Scandinavian country, home of LEGO." },
+                    { emoji: "⚓🇺⚽", answer: "portugal", hint: "Located on the Iberian Peninsula, west of Spain." },
+                    { emoji: "🧍‍♂️🅰️", answer: "kenya", hint: "East African country, famous for wildlife safaris." }
+                ],
+                hard: [
+                    { emoji: "🆕💤🖼️", answer: "new zealand", hint: "Island country in the southwestern Pacific Ocean." },
+                    { emoji: "📩🦌🦵🅰️", answer: "indonesia", hint: "Archipelago of over 17,000 islands in Southeast Asia." },
+                    { emoji: "💈🖼️", answer: "poland", hint: "Central European country, capital is Warsaw." },
+                    { emoji: "👁🏃", answer: "iran", hint: "Middle Eastern country, formerly known as Persia." },
+                    { emoji: "🎤🅰️🫖", answer: "singapore", hint: "Island city-state off southern Malaysia." },
+                    { emoji: "🍭🍬👖", answer: "sweden", hint: "Scandinavian nation with thousands of coastal islands." },
+                    { emoji: "S👂🐝🅰️", answer: "serbia", hint: "Landlocked country in Southeast Europe." },
+                    { emoji: "😡⛽🚗", answer: "madagascar", hint: "Large island nation off the southeast coast of Africa." }
+                ]
+            };
+            // --- End of Question Bank ---
 
-/**
- * Current active language
- * This variable is used by:
- * - applyTranslations() to know which language to apply
- * - UI update functions to show correct text
- * - Feedback messages to display in correct language
- */
-let currentLanguage = 'us';
+            // --- Game State Variables ---
+            let currentQuestions = []; // Array to hold questions for the current game
+            let currentQuestionIndex = 0; // Index of the current question
+            let score = 0; // Player's score
+            let lives = 3; // Player's lives
+            let timer; // Interval ID for the question timer
+            let timeLeft = 30; // Time remaining for the current question
+            let correctAnswersCount = 0; // Added for correct count
+            let incorrectAnswersCount = 0; // Added for incorrect count
+            // let musicPlayer; // Tone.js synth instance for music/sound
+            // let isMusicPlaying = false; // Flag to track music state
+            let hintUsedThisQuestion = false; // Flag to track if hint was used for the current question
+            // --- End of Game State Variables ---
 
-/**
- * ============================================================================
- * DOM ELEMENTS
- * ============================================================================
- * 
- * This section contains all DOM element references.
- * These elements are used throughout the game for:
- * - User interface updates
- * - Event handling
- * - Game state display
- * - User input processing
- */
+            // --- Animation Setup ---
+            const backgroundColors = ['#FFD700', '#1E90FF', '#32CD32', '#FF4500']; // Gold, Blue, Green, Red
+            let currentColorIndex = 0;
 
-/**
- * Game Screens
- * Main containers for different game states.
- * These elements control the visibility of:
- * - Welcome screen (initial setup)
- * - Game screen (active gameplay)
- * - Various modals (game over, level completion, etc.)
- */
-const welcomeScreen = document.getElementById("welcomeScreen");
-const gameScreen = document.getElementById("gameScreen");
-
-/**
- * Welcome Screen Elements
- * Elements used in the initial welcome screen.
- * These handle:
- * - Player information collection
- * - Difficulty selection
- * - Game initialization
- */
-const continueBtn = document.getElementById("continueBtn");
-const playerNameInput = document.getElementById("playerName");
-const playerAgeInput = document.getElementById("playerAge");
-const playerGenderSelect = document.getElementById("playerGender");
-
-/**
- * Game Screen Elements
- * Elements used during active gameplay.
- * These handle:
- * - Riddle display
- * - Answer input
- * - Game controls
- * - Player feedback
- */
-const playerNameDisplay = document.getElementById("playerNameDisplay");
-const emojiDisplay = document.getElementById("emoji");
-const answerInput = document.getElementById("answerInput");
-const submitBtn = document.getElementById("submitBtn");
-const hintBtn = document.getElementById("hintBtn");
-const nextBtn = document.getElementById("nextBtn");
-const restartLevelBtn = document.getElementById("restartLevelBtn");
-const restartGameBtn = document.getElementById("restartGameBtn");
-
-/**
- * Score Display Elements
- * Elements used to show game progress and scores.
- * These display:
- * - Overall game statistics
- * - Current level progress
- * - Player's high score
- * - Remaining lives
- */
-const overallCorrectScoreDisplay = document.getElementById("overallCorrectScoreDisplay");
-const overallWrongScoreDisplay = document.getElementById("overallWrongScoreDisplay");
-const levelCorrectScoreDisplay = document.getElementById("levelCorrectScoreDisplay");
-const levelWrongScoreDisplay = document.getElementById("levelWrongScoreDisplay");
-const currentDifficultyNameDisplay = document.getElementById("currentDifficultyNameDisplay");
-const feedbackDisplay = document.getElementById("feedback");
-const highScoreDisplay = document.getElementById("highScoreDisplay");
-const livesLeftDisplay = document.getElementById("livesLeftDisplay");
-const currentLevelDisplayElement = document.getElementById("current-level-display");
-
-/**
- * Theme and Menu Elements
- * Elements for UI customization and navigation.
- * These handle:
- * - Theme switching (light/dark)
- * - Menu toggling
- * - Game settings
- */
-const themeToggle = document.getElementById('theme-toggle');
-const themeIconLight = document.getElementById('theme-icon-light');
-const themeIconDark = document.getElementById('theme-icon-dark');
-const menuBtn = document.getElementById('menu-btn');
-
-/**
- * Modal Elements
- * Elements for various game state modals.
- * These handle:
- * - Game over state
- * - Level completion
- * - Maximum attempts reached
- * - Game menu
- * 
- * Each modal has:
- * - Close button
- * - Action buttons
- * - Status messages
- */
-const gameOverModal = document.getElementById('game-over-modal');
-const modalCloseButton = document.getElementById('modal-close');
-const modalPlayAgainButton = document.getElementById('modal-play-again-button');
-const finalScoreModalDisplay = document.getElementById('final-score-display');
-const gameOverFinalMessage = document.getElementById('game-over-final-message');
-
-const levelCompletionModal = document.getElementById('level-completion-modal');
-const levelCompletionModalClose = document.getElementById('level-completion-modal-close');
-const levelCompletionNextLevelButton = document.getElementById('level-completion-next-level-button');
-const levelCompletionPlayAgainButton = document.getElementById('level-completion-play-again-button');
-const levelCompletionTitle = document.getElementById('level-completion-title');
-const levelCompletionMessage = document.getElementById('level-completion-message');
-
-const maxAttemptsModal = document.getElementById('max-attempts-modal');
-const maxAttemptsModalClose = document.getElementById('max-attempts-modal-close');
-const maxAttemptsRestartGameButton = document.getElementById('max-attempts-restart-game-button');
-
-const gameMenuModal = document.getElementById('game-menu-modal');
-const gameMenuModalClose = document.getElementById('game-menu-modal-close');
-const menuReturnWelcomeBtn = document.getElementById('menu-return-welcome');
-const menuToggleSoundBtn = document.getElementById('menu-toggle-sound');
-const menuToggleMusicBtn = document.getElementById('menu-toggle-music');
-
-/**
- * ============================================================================
- * AUDIO SYSTEM
- * ============================================================================
- * 
- * This section manages all audio-related functionality in the game.
- * The audio system provides:
- * - Background music during gameplay
- * - Sound effects for correct/incorrect answers
- * - Celebration sounds for level completion
- * - Fallback to Tone.js for basic sound effects
- * 
- * The system is designed to:
- * - Handle browser autoplay restrictions
- * - Provide graceful fallbacks
- * - Support user preferences (sound on/off)
- * - Manage audio context lifecycle
- */
-
-/**
- * Audio elements and controls
- * These elements handle:
- * - Background music playback
- * - Sound effect playback
- * - Audio state management
- * 
- * The audioContext is used to:
- * - Control audio timing
- * - Handle audio state
- * - Manage audio permissions
- */
-const backgroundMusic = document.getElementById("background-music");
-const celebrationAudio = document.getElementById("celebration-audio");
-let audioContext = null;
-
-/**
- * Sound & Music Control
- * These variables control:
- * - Whether sound effects are enabled
- * - Whether background music is enabled
- * - The synthesizer for fallback sounds
- * 
- * The synth variable is used by:
- * - playToneCelebration() for victory sounds
- * - playIncorrectSound() for wrong answers
- * - Fallback when audio files fail to load
- */
-let isSoundEnabled = true;
-let isMusicEnabled = true;
-let synth;
-
-/**
- * Initialize Tone.js if available
- * This provides a fallback sound system when:
- * - Audio files fail to load
- * - Browser doesn't support audio files
- * - User has disabled audio files
- */
-if (typeof Tone !== 'undefined') {
-    synth = new Tone.Synth().toDestination();
-} else {
-    console.warn("Tone.js not loaded. Simple sound effects will be disabled.");
-    synth = { triggerAttackRelease: () => console.log("Sound fallback: Beep!") };
-}
-
-/**
- * ============================================================================
- * TIMER SYSTEM
- * ============================================================================
- * 
- * This section manages the game's countdown timer functionality.
- * The timer system provides:
- * - Visual countdown display
- * - SVG circle animation
- * - Time-up handling
- * - Game state management
- * 
- * The system is used to:
- * - Create time pressure
- * - Handle time-based game over
- * - Provide visual feedback
- * - Manage game flow
- */
-
-/**
- * Timer variables and constants
- * These control:
- * - Timer display
- * - Animation state
- * - Countdown logic
- * 
- * The SVG path is used for:
- * - Visual countdown circle
- * - Progress animation
- * - Time remaining display
- */
-const timerSVGPath = document.querySelector("#timerDisplay .timer-progress");
-const timerText = document.getElementById("timerText");
-const FULL_DASH_ARRAY = 282.743;  // Circumference of the timer circle
-const TIME_LIMIT = 30;            // Time limit in seconds
-let timeLeft = TIME_LIMIT;        // Current time remaining
-let timerInterval = null;         // Interval for countdown
-
-/**
- * Reset timer to initial state
- * This function:
- * - Resets the countdown
- * - Updates the display
- * - Resets the animation
- * 
- * Used by:
- * - startTimer() for initialization
- * - startLevel() for level reset
- * - resetFullGame() for game reset
- */
-function resetTimer() {
-    timeLeft = TIME_LIMIT;
-    if (timerText) timerText.textContent = timeLeft;
-    setCircleDashoffset(0);
-}
-
-/**
- * Start the countdown timer
- * This function:
- * - Initializes the timer
- * - Starts the countdown
- * - Updates the display
- * - Handles time-up
- * 
- * The timer affects:
- * - Game difficulty
- * - Player pressure
- * - Score calculation
- * - Game over conditions
- */
-function startTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-    }
-    
-    resetTimer();
-    
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        
-        if (timerText) {
-            timerText.textContent = timeLeft;
-        }
-        
-        const timeFraction = timeLeft / TIME_LIMIT;
-        const dashOffset = FULL_DASH_ARRAY * (1 - timeFraction);
-        setCircleDashoffset(dashOffset);
-        
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            handleTimeUp();
-        }
-    }, 1000);
-}
-
-/**
- * Stop the timer
- * This function:
- * - Cleans up the interval
- * - Prevents memory leaks
- * - Resets timer state
- * 
- * Used by:
- * - handleTimeUp() when time runs out
- * - startLevel() when starting new level
- * - resetFullGame() when resetting game
- */
-function stopTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-}
-
-/**
- * Update timer circle animation
- * This function:
- * - Updates the SVG circle
- * - Shows visual progress
- * - Provides user feedback
- * 
- * @param {number} offset - The dash offset for the SVG circle
- * Used by:
- * - startTimer() for continuous updates
- * - resetTimer() for initial state
- */
-function setCircleDashoffset(offset) {
-    if (timerSVGPath) {
-        timerSVGPath.style.strokeDashoffset = offset;
-    }
-}
-
-/**
- * Handle timer completion
- * This function:
- * - Manages game state when time runs out
- * - Updates lives
- * - Shows feedback
- * - Handles game over
- * 
- * Triggers:
- * - Lives reduction
- * - Feedback display
- * - Game over if no lives left
- * - Next riddle preparation
- */
-function handleTimeUp() {
-    stopTimer();
-    livesLeft--;
-    updateLivesDisplay();
-    
-    if (livesLeft <= 0) {
-        triggerNoLivesGameOver();
-    } else {
-        // Show feedback for time up
-        if (feedbackDisplay) {
-            feedbackDisplay.textContent = translations[currentLanguage]?.timeUp || "Time's up!";
-            feedbackDisplay.className = 'feedback incorrect';
-        }
-        
-        // Show the correct answer
-        const currentRiddle = riddles[currentRiddleIndexInLevel];
-        if (currentRiddle) {
-            setTimeout(() => {
-                if (feedbackDisplay) {
-                    feedbackDisplay.textContent = `${translations[currentLanguage]?.correctAnswerWas || "The correct answer was"}: ${currentRiddle.answer}`;
-                }
-                showNextButton();
-            }, 2000);
-        }
-    }
-}
-
-/**
- * ============================================================================
- * GAME STATE & RIDDLES
- * ============================================================================
- * 
- * This section manages the core game data and state.
- * The game state system:
- * - Tracks player progress
- * - Manages difficulty levels
- * - Handles score tracking
- * - Controls game flow
- * 
- * The riddles system:
- * - Organizes questions by difficulty
- * - Manages riddle progression
- * - Handles answer validation
- * - Controls level completion
- */
-
-/**
- * Game riddles organized by difficulty level
- * Structure:
- * {
- *   difficulty: [
- *     { emoji: "clue", answer: "correct answer" },
- *     ...
- *   ]
- * }
- * 
- * Used by:
- * - startLevel() to load appropriate riddles
- * - handleSubmitAnswer() to validate answers
- * - loadNextRiddle() to progress through the game
- */
-const allRiddles = {
-    easy: [
-        { emoji: "🇯 🍳", answer: "japan" },
-        { emoji: "👙💤🤧", answer: "brazil" },
-        { emoji: "🔗🅰️", answer: "china" },
-        { emoji: "4️⃣🐜🐜", answer: "france" },
-        { emoji: "🍐🦘", answer: "peru" }
-    ],
-    medium: [
-        { emoji: "🧊🅰️", answer: "cuba" },
-        { emoji: "🍳🅰️🤰", answer: "panama" },
-        { emoji: "🐄🪨🅾️", answer: "morocco" },
-        { emoji: "🐋🐬", answer: "wales" },
-        { emoji: "👖✅", answer: "denmark" },
-        { emoji: "⚓🇺⚽", answer: "portugal" },
-        { emoji: "🧍‍♂️🅰️", answer: "kenya" }
-    ],
-    hard: [
-        { emoji: "🆕💤🖼️", answer: "new zealand" },
-        { emoji: "📩🦌🦵🅰️", answer: "indonesia" },
-        { emoji: "💈🖼️", answer: "poland" },
-        { emoji: "👁🏃", answer: "iran" },
-        { emoji: "🎤🅰️🫖", answer: "singapore" },
-        { emoji: "🍭🍬👖", answer: "sweden" },
-        { emoji: "S👂🐝🅰️", answer: "serbia" },
-        { emoji: "😡⛽🚗", answer: "madagascar" }
-    ]
-};
-
-/**
- * Game state variables
- * These track:
- * - Current difficulty level
- * - Active riddles
- * - Current riddle index
- * - Game progression
- * 
- * Used by:
- * - startLevel() to set up the level
- * - handleSubmitAnswer() to track progress
- * - loadNextRiddle() to manage riddle flow
- * - handleLevelEnd() to check completion
- */
-const difficultyOrder = ['easy', 'medium', 'hard'];
-let currentDifficultyIndex = 0;
-let currentDifficulty = 'easy';
-let riddles = [];
-let currentRiddleIndexInLevel = 0;
-
-/**
- * Score tracking variables
- * These manage:
- * - Overall game performance
- * - Current level performance
- * - High score tracking
- * - Progress display
- * 
- * Used by:
- * - updateAllScoreDisplays() to show progress
- * - saveUserHighScore() to persist achievements
- * - handleLevelEnd() to evaluate performance
- */
-let overallCorrectScore = 0;
-let overallWrongScore = 0;
-let correctAnswersThisLevel = 0;
-let mistakesThisLevel = 0;
-let currentHighScore = 0;
-
-/**
- * Lives system
- * This manages:
- * - Player attempts
- * - Game over conditions
- * - Difficulty balance
- * - Player feedback
- * 
- * Used by:
- * - handleTimeUp() to reduce lives
- * - handleSubmitAnswer() to check game over
- * - updateLivesDisplay() to show remaining lives
- */
-const MAX_LIVES = 3;
-let livesLeft = MAX_LIVES;
-
-/**
- * ============================================================================
- * GAME INITIALIZATION
- * ============================================================================
- * 
- * This section handles the game's startup and initialization.
- * The initialization system:
- * - Sets up event listeners
- * - Initializes game state
- * - Prepares UI elements
- * - Handles user preferences
- */
-
-/**
- * Initialize the game when DOM is loaded
- * This function:
- * - Sets up language system
- * - Initializes audio
- * - Sets up event listeners
- * - Prepares game state
- * 
- * The initialization sequence:
- * 1. Language setup
- * 2. Audio initialization
- * 3. Event listener setup
- * 4. Game state preparation
- */
-document.addEventListener('DOMContentLoaded', () => {
-    initializeLanguageSelection();
-    applyTranslations(currentLanguage);
-    setupEventListeners();
-});
-
-/**
- * Set up all game event listeners
- * This function:
- * - Attaches click handlers
- * - Sets up input listeners
- * - Configures modal interactions
- * - Manages game flow
- * 
- * The event system handles:
- * - User input
- * - Game progression
- * - UI interactions
- * - State changes
- */
-function setupEventListeners() {
-    // Welcome screen events
-    if (continueBtn) {
-        continueBtn.addEventListener('click', startLevel);
-    }
-    // Game screen events
-    if (submitBtn) {
-        submitBtn.addEventListener('click', handleSubmitAnswer);
-    }
-    if (nextBtn) {
-        nextBtn.addEventListener('click', loadNextRiddle);
-    }
-    if (restartLevelBtn) {
-        restartLevelBtn.addEventListener('click', startLevel);
-    }
-    if (restartGameBtn) {
-        restartGameBtn.addEventListener('click', resetFullGame);
-    }
-    // Menu events
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-    // Modal events
-    setupModalEventListeners();
-}
-
-/**
- * Set up modal event listeners
- * This function:
- * - Configures modal interactions
- * - Handles modal state
- * - Manages user choices
- * - Controls game flow
- * 
- * The modal system handles:
- * - Game over state
- * - Level completion
- * - Maximum attempts
- * - Game menu
- */
-function setupModalEventListeners() {
-    // Game over modal
-    if (modalCloseButton) {
-        modalCloseButton.addEventListener('click', () => gameOverModal.classList.add('hidden'));
-    }
-    if (modalPlayAgainButton) {
-        modalPlayAgainButton.addEventListener('click', resetFullGame);
-    }
-    
-    // Level completion modal
-    if (levelCompletionModalClose) {
-        levelCompletionModalClose.addEventListener('click', () => levelCompletionModal.classList.add('hidden'));
-    }
-    if (levelCompletionNextLevelButton) {
-        levelCompletionNextLevelButton.addEventListener('click', startNextLevel);
-    }
-    if (levelCompletionPlayAgainButton) {
-        levelCompletionPlayAgainButton.addEventListener('click', startLevel);
-    }
-    
-    // Max attempts modal
-    if (maxAttemptsModalClose) {
-        maxAttemptsModalClose.addEventListener('click', () => maxAttemptsModal.classList.add('hidden'));
-    }
-    if (maxAttemptsRestartGameButton) {
-        maxAttemptsRestartGameButton.addEventListener('click', resetFullGame);
-    }
-    
-    // Game menu modal
-    if (gameMenuModalClose) {
-        gameMenuModalClose.addEventListener('click', () => gameMenuModal.classList.add('hidden'));
-    }
-    if (menuReturnWelcomeBtn) {
-        menuReturnWelcomeBtn.addEventListener('click', returnToWelcome);
-    }
-    if (menuToggleSoundBtn) {
-        menuToggleSoundBtn.addEventListener('click', toggleSound);
-    }
-    if (menuToggleMusicBtn) {
-        menuToggleMusicBtn.addEventListener('click', toggleMusic);
-    }
-}
-
-// Game Over Handling
-function triggerNoLivesGameOver() {
-    console.log("triggerNoLivesGameOver called");
-    stopTimer();
-    stopBackgroundMusic();
-    
-    if (feedbackDisplay) {
-        feedbackDisplay.textContent = translations[currentLanguage]?.gameOverNoLives || "No lives left! Game Over.";
-        feedbackDisplay.className = "incorrect";
-    }
-    
-    // Save high score before ending
-    saveUserHighScore();
-    
-    // Show game over modal
-    if (gameOverModal) {
-        if (finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
-        if (gameOverFinalMessage) gameOverFinalMessage.textContent = translations[currentLanguage]?.gameOverMessage || "Game Over! Better luck next time.";
-        gameOverModal.style.display = 'block';
-    }
-    
-    // Disable game controls
-    if (submitBtn) submitBtn.disabled = true;
-    if (answerInput) answerInput.disabled = true;
-    if (nextBtn) nextBtn.classList.add("hidden");
-}
-
-// ============================================================================
-// GAME LOGIC FUNCTIONS
-// ============================================================================
-// Core game mechanics and logic that handle:
-// - Player input processing
-// - Game progression management
-// - Difficulty level control
-// - Answer validation and scoring
-
-// Handles answer submission and validation
-// Flow: 1. Validates input 2. Checks answer 3. Updates scores 4. Manages progression
-function handleSubmitAnswer() {
-    const answer = answerInput.value.trim().toLowerCase();
-    const currentRiddle = riddles[currentRiddleIndexInLevel];
-    
-    if (!answer) {
-        if (feedbackDisplay) {
-            feedbackDisplay.textContent = translations[currentLanguage]?.emptyAnswer || "Please enter an answer.";
-            feedbackDisplay.className = 'feedback incorrect';
-        }
-        return;
-    }
-    
-    stopTimer();
-    
-    if (answer === currentRiddle.answer.toLowerCase()) {
-        // Correct answer handling
-        overallCorrectScore++;
-        correctAnswersThisLevel++;
-        updateAllScoreDisplays();
-        
-        if (feedbackDisplay) {
-            feedbackDisplay.textContent = translations[currentLanguage]?.correctFeedback || "✅ Correct!";
-            feedbackDisplay.className = 'feedback correct';
-        }
-        
-        playCelebrationSoundOrMusic();
-    } else {
-        // Incorrect answer handling
-        overallWrongScore++;
-        mistakesThisLevel++;
-        livesLeft--;
-        updateAllScoreDisplays();
-        updateLivesDisplay();
-        
-        if (feedbackDisplay) {
-            feedbackDisplay.textContent = `${translations[currentLanguage]?.incorrectFeedback || "❌ Incorrect!"} ${translations[currentLanguage]?.correctAnswerWas || "The correct answer was"}: ${currentRiddle.answer}`;
-            feedbackDisplay.className = 'feedback incorrect';
-        }
-        
-        playIncorrectSound();
-        
-        if (livesLeft <= 0) {
-            triggerNoLivesGameOver();
-            return;
-        }
-    }
-    
-    showNextButton();
-}
-
-// Loads the next riddle in the current level
-// Flow: 1. Advances riddle 2. Updates UI 3. Handles completion 4. Manages progression
-function loadNextRiddle() {
-    currentRiddleIndexInLevel++;
-    
-    if (currentRiddleIndexInLevel < riddles.length) {
-        // Load next riddle in current level
-        if (emojiDisplay) emojiDisplay.textContent = riddles[currentRiddleIndexInLevel].emoji;
-        if (answerInput) {
-            answerInput.value = '';
-            answerInput.disabled = false;
-        }
-        if (submitBtn) submitBtn.classList.remove('hidden');
-        if (nextBtn) nextBtn.classList.add('hidden');
-        if (hintBtn) hintBtn.classList.add('hidden');
-        if (feedbackDisplay) {
-            feedbackDisplay.textContent = '';
-            feedbackDisplay.className = '';
-        }
-        startTimer();
-    } else {
-        // Level completed
-        handleLevelEnd();
-    }
-}
-
-// Initializes and starts a new level
-// Flow: 1. Resets variables 2. Loads riddles 3. Updates UI 4. Starts first riddle
-function startLevel() {
-    console.log("startLevel called for difficulty:", currentDifficulty);
-    if (!allRiddles[currentDifficulty]) {
-        console.error("Invalid difficulty or no riddles for:", currentDifficulty, ". Defaulting to easy.");
-        currentDifficulty = 'easy';
-        currentDifficultyIndex = difficultyOrder.indexOf('easy');
-        // Optionally, check the 'easy' radio button visually
-        const easyRadio = document.getElementById('difficultyEasy');
-        if (easyRadio) easyRadio.checked = true;
-    }
-
-    riddles = [...allRiddles[currentDifficulty]];
-    shuffleArray(riddles); // Make sure shuffleArray is defined
-    console.log("Riddles loaded for level:", riddles.length, "First riddle (if any):", riddles.length > 0 ? riddles[0] : "N/A"); // ADDED more detail to log
-
-    currentRiddleIndexInLevel = 0;
-    mistakesThisLevel = 0;
-    correctAnswersThisLevel = 0;
-
-    updateAllScoreDisplays();
-
-    const difficultyKey = currentDifficulty;
-    const translatedPrefix = translations[currentLanguage]?.currentLevelPrefix || "Current Level";
-    const translatedDifficultyText = translations[currentLanguage]?.[difficultyKey] || (difficultyKey.charAt(0).toUpperCase() + difficultyKey.slice(1));
-    if (currentLevelDisplayElement) currentLevelDisplayElement.textContent = `${translatedPrefix}: ${translatedDifficultyText}`;
-    if (currentDifficultyNameDisplay) currentDifficultyNameDisplay.textContent = translatedDifficultyText;
-
-    if (answerInput) answerInput.disabled = false;
-    if (submitBtn) submitBtn.classList.remove("hidden");
-    if (nextBtn) nextBtn.classList.add("hidden");
-
-    updateLivesDisplay();
-    console.log("Calling loadNextRiddle from startLevel"); // ADDED log
-    loadNextRiddle();
-
-    if (isAuthReady) {
-        loadUserHighScore();
-    }
-}
-
-// Handles level completion and progression
-// Flow: 1. Evaluates performance 2. Shows feedback 3. Manages progression 4. Handles completion
-function handleLevelEnd() {
-    console.log("handleLevelEnd called");
-    stopTimer();
-    
-    // Save progress
-    saveUserHighScore();
-    
-    // Check if there are more difficulty levels
-    if (currentDifficultyIndex < difficultyOrder.length - 1) {
-        // There's a next level
-        if (levelCompletionModal) {
-            if (levelCompletionTitle) levelCompletionTitle.textContent = translations[currentLanguage]?.levelCompletedTitle || "Level Completed!";
-            if (levelCompletionMessage) levelCompletionMessage.textContent = translations[currentLanguage]?.levelCompletedCongrats || "Excellent work!";
-            
-            triggerConfetti();
-            playCelebrationSoundOrMusic();
-            levelCompletionModal.style.display = 'block';
-        }
-    } else {
-        // All levels completed
-        if (gameOverModal) {
-            if (finalScoreModalDisplay) finalScoreModalDisplay.textContent = overallCorrectScore;
-            if (gameOverFinalMessage) gameOverFinalMessage.textContent = translations[currentLanguage]?.allLevelsCompleted || "You've mastered all levels!";
-            gameOverModal.style.display = 'block';
-        }
-    }
-}
-
-// Ensure shuffleArray is defined (if not already present)
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-// Prevent multiple answer submissions per question
-let answerLocked = false;
-
-// Defensive: Null checks for all DOM queries
-
-// Clean up timers and intervals on reset
-function resetFullGame() { 
-    stopTimer();
-    stopBackgroundMusic(); 
-    livesLeft = MAX_LIVES; 
-    overallCorrectScore = 0;
-    overallWrongScore = 0;
-    currentDifficultyIndex = 0; 
-    if(document.getElementById('difficultyEasy')) document.getElementById('difficultyEasy').checked = true; 
-    welcomeScreen.classList.remove("hidden");
-    gameScreen.classList.add("hidden");
-    if(gameOverModal) gameOverModal.style.display = "none";
-    if(levelCompletionModal) levelCompletionModal.style.display = "none";
-    if(maxAttemptsModal) maxAttemptsModal.style.display = "none"; 
-    if(gameMenuModal) gameMenuModal.style.display = "none"; 
-    updateAllScoreDisplays(); 
-    if(playerNameDisplay && playerNameInput) playerNameDisplay.textContent = playerNameInput.value.trim() || "Player";
-    if(feedbackDisplay) feedbackDisplay.textContent = "";
-    // Clear answer input
-    if(answerInput) answerInput.value = '';
-    // Reset answer lock
-    answerLocked = false;
-}
-
-// Language Translations
-function applyTranslations(lang) {
-    if (!translations[lang]) return;
-
-    // Update all elements with data-translate-key attribute
-    document.querySelectorAll('[data-translate-key]').forEach(element => {
-        const key = element.getAttribute('data-translate-key');
-        if (translations[lang][key]) {
-            element.textContent = translations[lang][key];
-        }
-    });
-
-    // Update all elements with data-translate-placeholder attribute
-    document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
-        const key = element.getAttribute('data-translate-placeholder');
-        if (translations[lang][key]) {
-            element.placeholder = translations[lang][key];
-        }
-    });
-
-    // Update menu sound/music buttons
-    const menuToggleSoundBtn = document.getElementById('menu-toggle-sound');
-    const menuToggleMusicBtn = document.getElementById('menu-toggle-music');
-    
-    if (menuToggleSoundBtn) {
-        menuToggleSoundBtn.textContent = translations[lang].menuToggleSound.replace('ON', isSoundEnabled ? 'ON' : 'OFF');
-    }
-    if (menuToggleMusicBtn) {
-        menuToggleMusicBtn.textContent = translations[lang].menuToggleMusic.replace('ON', isMusicEnabled ? 'ON' : 'OFF');
-    }
-
-    if (!gameScreen.classList.contains('hidden') && currentLevelDisplayElement) {
-        const difficultyKey = currentDifficulty; 
-        const translatedPrefix = translations[lang]?.currentLevelPrefix || "Current Level";
-        const translatedDifficulty = translations[lang]?.[difficultyKey] || (difficultyKey.charAt(0).toUpperCase() + difficultyKey.slice(1));
-        currentLevelDisplayElement.textContent = `${translatedPrefix}: ${translatedDifficulty}`;
-        if(currentDifficultyNameDisplay) currentDifficultyNameDisplay.textContent = translatedDifficulty;
-    }
-
-    document.querySelectorAll(".flag-btn").forEach(btn => {
-        btn.classList.remove("active");
-        if (btn.getAttribute("data-lang") === lang) {
-            btn.classList.add("active");
-        }
-    });
-    localStorage.setItem("selectedQuizLanguage", lang);
-}
-
-// Language selection functionality
-function initializeLanguageSelection() {
-    const flagButtons = document.querySelectorAll('.flag-btn');
-    const languageSidebar = document.getElementById('language-sidebar');
-    const menuBtn = document.getElementById('menu-btn');
-
-    flagButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const lang = button.getAttribute('data-lang');
-            if (lang && translations[lang]) {
-                currentLanguage = lang;
-                applyTranslations(lang);
-                languageSidebar.classList.add('hidden');
+            function changeBackgroundColor() {
+                currentColorIndex = (currentColorIndex + 1) % backgroundColors.length;
+                document.body.style.backgroundColor = backgroundColors[currentColorIndex];
             }
-        });
-    });
+            setInterval(changeBackgroundColor, 5000); // Change color every 5 seconds
 
-    // Toggle language sidebar
-    if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
-            languageSidebar.classList.toggle('hidden');
-        });
-    }
-}
+            const flagEmojis = ['🇺🇸', '🇧🇷', '🇯🇵', '🇫🇷', '🇨🇳', '🇬🇧', '🇮🇳', '🇨🇦', '🇦🇺', '🇩🇪'];
+            const generalEmojis = ['😀', '🎉', '🌟', '🚀', '💡', '🎯', '🏆', '🧩', '🧠', '⏰'];
+            const allEmojisForRain = [...flagEmojis, ...generalEmojis];
 
-window.onerror = function (message, source, lineno, colno, error) {
-    console.error(`Error: ${message} at ${source}:${lineno}:${colno}`, error);
-};
+            function createFloatingEmoji() {
+                const emoji = document.createElement('div');
+                emoji.classList.add('floating-emoji');
+                emoji.textContent = flagEmojis[Math.floor(Math.random() * flagEmojis.length)];
+                document.body.appendChild(emoji);
+
+                // Random starting position and animation properties
+                const startX = Math.random() * window.innerWidth;
+                const startY = window.innerHeight + 50; // Start below the screen
+                const endY = -100; // End above the screen
+                const duration = Math.random() * 5 + 5; // 5-10 seconds duration
+                const delay = Math.random() * 3; // Stagger appearance
+
+                gsap.set(emoji, { x: startX, y: startY, opacity: 0 });
+                gsap.to(emoji, {
+                    y: endY,
+                    opacity: [0.8, 1, 0.8, 0], // Fade in, stay, fade out
+                    duration: duration,
+                    delay: delay,
+                    ease: "power1.inOut",
+                    onComplete: () => {
+                        emoji.remove(); // Remove emoji from DOM after animation
+                    }
+                });
+            }
+
+            // Create floating emojis at intervals
+            // Adjust interval for more or fewer emojis
+            setInterval(createFloatingEmoji, 2000); // Create a new floating emoji every 2 seconds
+
+
+            function createFallingEmoji() {
+                const emoji = document.createElement('div');
+                emoji.classList.add('floating-emoji'); // Can reuse some styling
+                emoji.textContent = allEmojisForRain[Math.floor(Math.random() * allEmojisForRain.length)];
+                emoji.style.fontSize = `${Math.random() * 1.5 + 1}em`; // Random size (1em to 2.5em)
+                document.body.appendChild(emoji);
+
+                let startX, startY, endX, endY;
+                const sideRoll = Math.random();
+
+                if (sideRoll < 0.6) { // 60% chance: Start from Top
+                    startX = Math.random() * window.innerWidth;
+                    startY = -50; // Start above screen
+                    // Emojis from top fall mostly downwards, with a horizontal drift
+                    endX = startX + (Math.random() - 0.5) * (window.innerWidth / 4); 
+                    endY = window.innerHeight + 50; // End below screen
+                    // Ensure endX is within reasonable screen bounds
+                    endX = Math.max(-100, Math.min(window.innerWidth + 100, endX));
+                } else if (sideRoll < 0.8) { // 20% chance: Start from Left
+                    startX = -50; // Start left of screen
+                    startY = Math.random() * window.innerHeight; // Random height on the left edge
+                    // Emojis from left fall diagonally towards the bottom right area
+                    endX = Math.random() * (window.innerWidth / 2) + (window.innerWidth / 2); // Target right half
+                    endY = window.innerHeight + 50; // End below screen
+                } else { // 20% chance: Start from Right
+                    startX = window.innerWidth + 50; // Start right of screen
+                    startY = Math.random() * window.innerHeight; // Random height on the right edge
+                    // Emojis from right fall diagonally towards the bottom left area
+                    endX = Math.random() * (window.innerWidth / 2); // Target left half
+                    endY = window.innerHeight + 50; // End below screen
+                }
+
+                const duration = Math.random() * 5 + 6; // Duration 6-11 seconds
+                const rotation = Math.random() * 360 - 180; // Random rotation
+
+                gsap.set(emoji, { x: startX, y: startY, opacity: 1, rotation: 0 });
+                gsap.to(emoji, {
+                    x: endX, // Animate x-coordinate
+                    y: endY, // Animate y-coordinate
+                    rotation: rotation,
+                    opacity: 0,
+                    duration: duration,
+                    ease: "power1.in", // Emojis accelerate as they fall
+                    onComplete: () => {
+                        emoji.remove();
+                    }
+                });
+            }
+
+            function startEmojiRain() {
+                createFallingEmoji();
+                requestAnimationFrame(startEmojiRain);
+            }
+
+            // Start the emoji rain - call it once to begin the loop
+            // To control the density, you might want to call createFallingEmoji on an interval
+            // instead of every frame, or add a conditional check inside startEmojiRain.
+            // For now, let's create one every few frames for a less dense effect.
+            let frameCount = 0;
+            function controlledEmojiRain() {
+                frameCount++;
+                if (frameCount % 10 === 0) { // Create an emoji roughly every 10 frames
+                    createFallingEmoji();
+                }
+                requestAnimationFrame(controlledEmojiRain);
+            }
+            controlledEmojiRain(); // Start the controlled rain
+
+            // --- End of Animation Setup ---
+
+
+            // --- Form Validation Functions ---
+            // Validates the pre-game form (name, age, gender)
+            function validatePreGameForm() {
+                // Enable continue button only if all fields are filled
+                continueButton.disabled = !(nameInput.value.trim() && ageInput.value && genderSelect.value);
+            }
+
+            // Validates the instructions form (difficulty selection)
+            function validateInstructionsForm() {
+                const difficultySelected = difficultySelect.value;
+                // Enable start button only if difficulty is selected
+                startButton.disabled = !difficultySelected;
+
+                // Update the time limit display based on selected difficulty
+                const timeLimitSpan = document.getElementById('time-limit');
+                if (difficultySelected === 'hard') {
+                    timeLimitSpan.textContent = '20';
+                } else {
+                    timeLimitSpan.textContent = '30'; // Default for easy/medium
+                }
+            }
+            // --- End of Form Validation Functions ---
+
+            // --- Event Listeners ---
+            // Pre-game form input listeners
+            nameInput.addEventListener('input', validatePreGameForm);
+            ageInput.addEventListener('input', validatePreGameForm);
+            genderSelect.addEventListener('change', validatePreGameForm);
+
+            // Instructions screen difficulty selection listener
+            difficultySelect.addEventListener('change', validateInstructionsForm);
+
+            // Button click listeners
+            continueButton.addEventListener('click', showInstructions); // Pre-game to Instructions
+            startButton.addEventListener('click', startGame);          // Instructions to Game
+            backButton.addEventListener('click', goBackToPreGame);      // Instructions to Pre-game
+            submitButton.addEventListener('click', checkAnswer);        // Submit answer in game
+            restartLevelButton.addEventListener('click', restartCurrentLevel);
+            newGameFromGameButton.addEventListener('click', returnToInstructionsFromGame);
+            hintButton.addEventListener('click', showHint); // Added listener for hint button
+            exitGameButton.addEventListener('click', exitToPreGame); // Added listener for exit game button
+            
+            // Answer input listener for 'Enter' key press
+            answerInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+            nextButton.addEventListener('click', nextQuestion);         // Go to next question
+            
+            newGameButton.addEventListener('click', returnToInstructions); // Added listener for new game (back to instructions)
+            nextLevelButton.addEventListener('click', startNextLevel); // Added listener for next level
+            exitGameSummaryButton.addEventListener('click', exitToPreGameFromSummary); // Listener for Exit Game from Summary
+            // musicToggleButton.addEventListener('click', toggleMusic);   // Toggle background music
+
+            // About section button listeners
+            showAboutButton.addEventListener('click', () => {
+                preGameContainer.classList.add('hidden');
+                aboutContainer.classList.remove('hidden');
+            });
+
+            backToPreGameButton.addEventListener('click', () => {
+                aboutContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+            });
+            // --- End of Event Listeners ---
+
+            // --- Navigation Functions ---
+            // Shows the instructions screen and hides the pre-game screen
+            function showInstructions() {
+                preGameContainer.classList.add('hidden');
+                aboutContainer.classList.add('hidden'); // Ensure about is hidden too
+                instructionsContainer.classList.remove('hidden');
+                validateInstructionsForm(); // Ensure start button state is correct on show
+            }
+
+            // Shows the pre-game screen and hides the instructions screen
+            function goBackToPreGame() {
+                instructionsContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+            }
+
+            // Shows the instructions screen from the summary screen
+            function returnToInstructions() {
+                summaryContainer.classList.add('hidden');
+                instructionsContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden
+                validateInstructionsForm(); // Ensure start button state is correct
+            }
+
+            // Shows the instructions screen from the game screen
+            function returnToInstructionsFromGame() {
+                clearInterval(timer); // Stop the game timer
+                gameContainer.classList.add('hidden');
+                instructionsContainer.classList.remove('hidden');
+                validateInstructionsForm(); // Ensure start button state is correct
+            }
+
+            // Exits the game and returns to the pre-game screen
+            function exitToPreGame() {
+                clearInterval(timer); // Stop the game timer
+                gameContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+
+                // Reset pre-game form fields for a clean start
+                nameInput.value = '';
+                ageInput.value = '';
+                genderSelect.value = '';
+                validatePreGameForm(); // Update continue button state based on cleared form
+            }
+
+            // Exits the game from the summary screen and returns to the pre-game screen
+            function exitToPreGameFromSummary() {
+                summaryContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden
+
+                // Reset pre-game form fields for a clean start
+                nameInput.value = '';
+                genderSelect.value = '';
+                validatePreGameForm(); // Update continue button state based on cleared form
+            }
+            // --- End of Navigation Functions ---
+
+            // --- Core Game Logic Functions ---
+            // Initializes and starts the game
+            function startGame() {
+                instructionsContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                hintUsedThisQuestion = false; 
+                hintButton.disabled = false;
+                
+                const difficulty = difficultySelect.value;
+                difficultyDisplay.textContent = `Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`; // Display difficulty
+                currentQuestions = questions[difficulty]; // Select questions based on difficulty
+                currentQuestionIndex = 0;
+                score = 0;
+                lives = 3;
+                correctAnswersCount = 0; // Reset correct count
+                incorrectAnswersCount = 0; // Reset incorrect count
+                
+                updateScore(); // Initialize score display
+                updateLives(); // Initialize lives display
+                updateCorrectIncorrectDisplay(); // Initialize counts display
+                loadQuestion(); // Load the first question
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden when a new game starts
+            }
+
+            // Restarts the current level
+            function restartCurrentLevel() {
+                if (!gameContainer.classList.contains('hidden')) { 
+                    clearInterval(timer); 
+                    hintUsedThisQuestion = false; 
+                    hintButton.disabled = false;
+                    feedbackDisplay.textContent = ''; // Clear hint/feedback
+
+                    // Reset level-specific state
+                    currentQuestionIndex = 0;
+                    lives = 3; // Reset lives to full for the level
+                    correctAnswersCount = 0; // Reset correct count
+                    incorrectAnswersCount = 0; // Reset incorrect count
+
+                    // Update UI
+                    updateLives();
+                    updateCorrectIncorrectDisplay(); // Update counts display
+                    // Score is maintained, so no need to call updateScore unless it changes.
+                    // updateScore(); 
+
+                    // Load the first question of the current difficulty
+                    loadQuestion();
+                }
+            }
+
+            // Starts the next difficulty level, preserving lives and score
+            function startNextLevel() {
+                summaryContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Hide it after click
+
+                let newDifficulty;
+                const currentDifficulty = difficultySelect.value;
+
+                if (currentDifficulty === 'easy') {
+                    newDifficulty = 'medium';
+                } else if (currentDifficulty === 'medium') {
+                    newDifficulty = 'hard';
+                } else {
+                    // This case should ideally not be reached if the button is managed correctly.
+                    // Fallback to instructions if somehow clicked after 'hard' or error.
+                    returnToInstructions(); 
+                    return;
+                }
+
+                difficultySelect.value = newDifficulty; // IMPORTANT: Update the actual select element
+                difficultyDisplay.textContent = `Difficulty: ${newDifficulty.charAt(0).toUpperCase() + newDifficulty.slice(1)}`;
+                currentQuestions = questions[newDifficulty];
+                currentQuestionIndex = 0;
+                // Lives and score are preserved from the previous level
+                correctAnswersCount = 0; // Reset counts for the new level
+                incorrectAnswersCount = 0; // Reset counts for the new level
+
+                updateScore(); // Update score display (score is preserved)
+                updateLives(); // Update lives display (lives are preserved)
+                updateCorrectIncorrectDisplay(); // Update counts display
+                loadQuestion(); // Load the first question of the new level
+            }
+
+            // Loads the current question or ends the game if no more questions
+            function loadQuestion() {
+                if (currentQuestionIndex < currentQuestions.length) {
+                    resetTimer(); 
+                    startTimer(); 
+                    hintUsedThisQuestion = false; 
+                    hintButton.disabled = false; 
+                    feedbackDisplay.textContent = ''; // Clear previous hint/feedback
+                    
+
+                    const question = currentQuestions[currentQuestionIndex];
+                    emojiClueDisplay.textContent = question.emoji;
+                    questionProgressDisplay.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+                    
+                    // Reset input and feedback fields
+                    answerInput.value = '';
+                    feedbackDisplay.textContent = '';
+                    feedbackDisplay.style.color = ''; // Reset feedback color
+                    answerInput.disabled = false;
+                    submitButton.disabled = false;
+                    nextButton.classList.add('hidden'); // Hide next button until answer is submitted
+                    answerInput.focus(); // Focus on the answer input field
+                } else {
+                    // All questions answered
+                    endGame("Congratulations!");
+                }
+            }
+
+            // Shows a hint for the current question, costs one life
+            function showHint() {
+                if (hintUsedThisQuestion) {
+                    feedbackDisplay.textContent = "Hint already used for this question.";
+                    feedbackDisplay.style.color = '#e74c3c';
+                    return;
+                }
+                if (lives <= 0) {
+                    feedbackDisplay.textContent = "No lives left for a hint!";
+                    feedbackDisplay.style.color = '#e74c3c';
+                    hintButton.disabled = true; // Disable if no lives at all
+                    return;
+                }
+
+                // This check is important to ensure there is a question loaded.
+                if (!currentQuestions || currentQuestionIndex >= currentQuestions.length) {
+                    feedbackDisplay.textContent = "No question loaded to give a hint for.";
+                    feedbackDisplay.style.color = '#e74c3c';
+                    return;
+                }
+
+                lives--;
+                updateLives();
+                playSound('incorrect'); // Using incorrect sound for losing a life
+
+                const hint = currentQuestions[currentQuestionIndex].hint;
+                feedbackDisplay.textContent = `💡 Hint: ${hint} (-1 Life)`;
+                feedbackDisplay.style.color = '#fd7e14'; // Orange color for hint message
+                hintUsedThisQuestion = true;
+                hintButton.disabled = true; 
+
+                if (lives === 0) {
+                    clearInterval(timer);
+                    answerInput.disabled = true;
+                    submitButton.disabled = true;
+                    nextButton.classList.remove('hidden');
+                    nextButton.focus(); 
+                    setTimeout(() => endGame("Game Over! Hint cost the last life."), 1500);
+                }
+            }
+
+            // Checks the player's answer against the correct answer
+            function checkAnswer() {
+                if (submitButton.disabled) return; // Prevent double submission if already processed
+                
+                clearInterval(timer); // Stop the timer
+                submitButton.disabled = true; // Disable submit button after an attempt
+                const userAnswer = answerInput.value.trim().toLowerCase();
+                const correctAnswer = currentQuestions[currentQuestionIndex].answer.toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    feedbackDisplay.textContent = '✅ Correct!';
+                    feedbackDisplay.style.color = '#2ecc71'; // Green for correct
+                    score++;
+                    correctAnswersCount++; // Increment correct count
+                    playSound('correct'); // Play correct answer sound
+                } else {
+                    feedbackDisplay.textContent = `❌ Incorrect! It\\'s ${correctAnswer}.`;
+                    feedbackDisplay.style.color = '#e74c3c'; // Red for incorrect
+                    lives--;
+                    incorrectAnswersCount++; // Increment incorrect count
+                    playSound('incorrect'); // Play incorrect answer sound
+                }
+
+                updateScore(); // Update score display
+                updateLives(); // Update lives display
+                updateCorrectIncorrectDisplay(); // Update counts display
+                answerInput.disabled = true; // Disable answer input
+                nextButton.classList.remove('hidden'); // Show next question button
+                nextButton.focus(); // Focus on next button
+
+                // Check if game over due to no lives
+                if (lives === 0) {
+                    setTimeout(() => endGame("Game Over!"), 2000); // Delay before showing summary
+                }
+            }
+            
+            // Handles the scenario when the timer runs out for a question
+            function handleTimeout() {
+                if (submitButton.disabled && answerInput.disabled) return; // Prevent double handling if already processed by checkAnswer
+                
+                clearInterval(timer); // Stop the timer
+                feedbackDisplay.textContent = "❌ Time\'s up!";
+                feedbackDisplay.style.color = '#e74c3c'; // Red for timeout
+                lives--;
+                incorrectAnswersCount++; // Increment incorrect count for timeout
+                playSound('incorrect'); // Play incorrect sound for timeout
+                updateLives(); // Update lives display
+                updateCorrectIncorrectDisplay(); // Update counts display
+                
+                // Disable input and submit button
+                answerInput.disabled = true;
+                submitButton.disabled = true;
+                nextButton.classList.remove('hidden'); // Show next question button
+                nextButton.focus();
+
+                // Check if game over due to no lives
+                if (lives === 0) {
+                    setTimeout(() => endGame("Game Over!"), 2000); // Delay before showing summary
+                } else if (currentQuestionIndex >= currentQuestions.length -1 && lives > 0) {
+                    // If it's the last question and time runs out, but player has lives, still end game.
+                     setTimeout(() => endGame("Game Over!"), 2000);
+                }
+            }
+
+            // Moves to the next question
+            function nextQuestion() {
+                currentQuestionIndex++;
+                loadQuestion(); // Load the subsequent question
+            }
+
+            // Displays a celebration animation when a level is completed
+            function displayCelebrationAnimation(summaryHeadingElement) {
+                const originalMessage = summaryHeadingElement.textContent;
+                // Add emojis with a span for animation targeting
+                summaryHeadingElement.innerHTML = `${originalMessage} <span id="celebration-emojis" style="display: inline-block; font-size: 1.2em;">🎉🏆✨</span>`;
+
+                const emojiSpan = document.getElementById('celebration-emojis');
+                if (emojiSpan) {
+                    let scale = 1;
+                    let growing = true;
+                    // Simple pulse animation for the emojis
+                    const animationInterval = setInterval(() => {
+                        scale += growing ? 0.05 : -0.05;
+                        if (scale > 1.4) growing = false; // Max scale
+                        if (scale < 1.0) growing = true;  // Min scale
+                        emojiSpan.style.transform = `scale(${scale})`;
+                    }, 100); // Animation speed
+
+                    // After 4 seconds, clear animation and restore original message
+                    setTimeout(() => {
+                        clearInterval(animationInterval);
+                        summaryHeadingElement.textContent = originalMessage; // Restore original text
+                    }, 4000); // Duration of the celebration display
+                } else {
+                    // Fallback if span somehow isn't found, just restore after timeout
+                     setTimeout(() => {
+                        summaryHeadingElement.textContent = originalMessage;
+                    }, 4000);
+                }
+            }
+
+            // Ends the game and displays the summary screen
+            function endGame(message) {
+                clearInterval(timer); // Ensure timer is stopped
+                gameContainer.classList.add('hidden');
+                summaryContainer.classList.remove('hidden');
+                const summaryHeading = document.querySelector('#summary-container h2');
+                finalScoreDisplay.textContent = `Your final score is: ${score}`;
+                nextLevelButton.classList.add('hidden'); // Hide by default, show only if applicable
+
+                if (message === "Congratulations!") {
+                    const currentDifficulty = difficultySelect.value;
+                    if (currentDifficulty === 'hard') {
+                        summaryHeading.textContent = "Congratulations! You\'ve completed all levels!";
+                        // nextLevelButton remains hidden
+                    } else {
+                        summaryHeading.textContent = message; // Regular "Congratulations!"
+                        nextLevelButton.classList.remove('hidden'); // Show "Next Level" button
+                    }
+                    playSound('levelComplete'); // Play level completion sound
+                    displayCelebrationAnimation(summaryHeading); // Show celebration animation
+                } else {
+                    summaryHeading.textContent = message; // e.g., "Game Over!"
+                }
+            }
+            // --- End of Core Game Logic Functions ---
+
+            // --- Sound Effects and Music ---
+            // Initializes the Tone.js player for sound effects
+            const soundEffects = {
+                correct: new Tone.Player("assets/sounds/correct.wav").toDestination(),
+                incorrect: new Tone.Player("assets/sounds/incorrect.wav").toDestination(),
+                // click: new Tone.Player("assets/sounds/click.wav").toDestination() // Example for other sounds
+            };
+
+            // Function to play a sound effect
+            function playSound(soundName) {
+                if (soundEffects[soundName]) {
+                    soundEffects[soundName].start();
+                }
+            }
+            // --- End of Sound Effects and Music ---
+
+            // --- Utility Functions ---
+            // No utility functions were explicitly defined in the original code.
+            // This section can be used for any helper functions needed across the script.
+
+            // --- End of Utility Functions ---
+
+            // --- Initial Setup ---
+            // No specific initial setup was required in the original code outside of event listeners and DOM readiness.
+            // This section can be used for any initialization logic needed at the start.
+
+            // --- End of Initial Setup ---
+        });
