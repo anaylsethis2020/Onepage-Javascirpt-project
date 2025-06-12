@@ -55,19 +55,62 @@ and a user-friendly design to deliver an engaging experience.
 |---------|----------|--------|
 | 💙 Electric Blue | `#1E90FF` | Main buttons and links |
 | 💛 Lemon Yellow | `#FFF44F` | Highlights and backgrounds |
+| 🟣 Vivid Purple | `#A259FF` | Animated background accent |
+| 🟢 Neon Green | `#00FFB2` | Animated background accent |
+| 🔵 Sky Blue | `#00CFFF` | Animated background accent |
+| 🟡 Gold | `#FFD700` | Animated background color cycle |
+| 🟢 Green | `#32CD32` | Animated background color cycle |
+| 🟠 Red | `#FF4500` | Animated background color cycle |
+| 🟩 Green | `#28a745` | Submit button, correct feedback |
+| 🟦 Blue | `#007bff` | Next button |
+| 🟧 Orange | `#fd7e14` | Hint button |
+| 🟨 Yellow | `#ffc107` | Restart button |
+| 🟦 Teal | `#17a2b8` | New Game button |
+| 🟥 Red | `#dc3545` | Exit Game button |
 | ⚪ White | `#FFFFFF` | Card backgrounds |
 | ⚫ Black | `#000000` | Text and accents |
 
-### 🔠 Fonts  
-- **Segoe UI** (UI and body)  
-- **Fredoka One** (headers and emojis)  
+**Note:**
+- The animated background features floating flag and general emojis, plus a color-cycling effect (Gold, Blue, Green, Red) for extra vibrancy and engagement. These colors are used in CSS keyframes and JavaScript for dynamic effects.
+- All colors are chosen for high contrast and accessibility, ensuring clear visibility of emojis, text, and UI elements across all devices.
+- Colors are defined as CSS variables for easy theme management. Example:
 
-### 📐 Wireframes  
-📌 [View Wireframes](assets/wireframes/) – Mobile, Tablet, Desktop  
+```css
+:root {
+  --electric-blue: #1E90FF;
+  --lemon-yellow: #FFF44F;
+  --vivid-purple: #A259FF;
+  --neon-green: #00FFB2;
+  --sky-blue: #00CFFF;
+  --gold: #FFD700;
+  --green: #32CD32;
+  --red: #FF4500;
+  --submit-green: #28a745;
+  --next-blue: #007bff;
+  --hint-orange: #fd7e14;
+  --restart-yellow: #ffc107;
+  --teal: #17a2b8;
+  --exit-red: #dc3545;
+  --white: #FFFFFF;
+  --black: #000000;
+}
+```
 
-### 🖼️ Imagery  
-- Emoji-based UI and live emoji background  
-- Language flags for selection  
+### 🖼️ Animated & Thematic Visuals
+- 🌈 **Animated background**: Floating flag and general emojis, plus a color-cycling effect for extra vibrancy and engagement.
+- ✈️ **Animated aircraft banner**: The instructions screen features a moving plane and message banner for a playful, thematic introduction.
+- 🎉 **Celebration animation**: Pulsing emojis appear in the summary heading when a level is completed, adding a festive touch.
+
+### 📊 Score Breakdown
+- The top bar displays not only the total score, but also separate counters for correct and incorrect answers, updating in real time as you play.
+
+### 📝 About Section
+- ℹ️ An About section is available from the pre-game screen, describing the game’s purpose and educational benefits.
+
+### ♿ Accessibility & Responsive Design
+- All interactive elements are keyboard accessible and tested for screen reader compatibility.
+- Color choices and font sizes meet WCAG AA standards for accessibility.
+- The UI is fully responsive and adapts seamlessly across mobile, tablet, and desktop screens.
 
 ---
 
@@ -267,6 +310,8 @@ and a user-friendly design to deliver an engaging experience.
     - Smooth transitions between questions, score updates, and game-end states.
       - **Functions:** `loadQuestion()`, `endGame()`, `displayCelebrationAnimation()` — These functions handle UI updates, feedback, and celebratory effects, ensuring the player experiences seamless transitions and clear feedback throughout the game.
 
+- **Note:** All the above logic is implemented as standalone functions, not as methods of a class or object. In JavaScript, a function is a block of code that can be called independently, while a method is a function that belongs to an object or class. This project uses a functional approach for simplicity and clarity, so each game flow step is handled by a named function (e.g., `startGame`, `loadQuestion`, `checkAnswer`). If you wish to refactor to an object-oriented style, these could be converted to methods within a `Game` class.
+
 ---    
 
 ## ⚙️ Development & Tech Stack
@@ -277,6 +322,47 @@ and a user-friendly design to deliver an engaging experience.
 - **Tone.js** for interactive sound effects
 - **LocalStorage** for offline data persistence
 - **Target Browser:** Chrome (optimized)
+
+---
+
+## 🐞 Development Issues & Solutions
+
+### Functional vs. Object-Oriented Approach
+
+- **Initial Approach:**  
+  The project initially considered using a class-based or object-oriented structure, where game logic would be encapsulated as methods within a `Game` class or similar object. This is a common pattern for complex applications, as it can help organize state and behavior.
+
+- **Why Refactored to Standalone Functions:**  
+  During development, it became clear that the game’s logic was best expressed as a series of clear, named functions (e.g., `startGame`, `loadQuestion`, `checkAnswer`) rather than as methods tied to a class instance.  
+  - The game state was simple and could be managed with a few variables.
+  - Standalone functions made the code easier to read, test, and maintain, especially for contributors less familiar with JavaScript classes.
+  - Avoided the complexity of `this` binding and class instantiation, which can be error-prone in event-driven browser code.
+  - Functions could be reused and composed more flexibly.
+
+- **Result:**  
+  The codebase was refactored to use standalone functions for all game logic, with clear separation of concerns and descriptive comments. This improved maintainability and reduced bugs related to state management.
+
+### Timer Bugs
+
+- **Issue:**  
+  The timer sometimes failed to reset correctly between questions, or continued counting down after the game ended.
+
+- **Solution:**  
+  Implemented dedicated `startTimer` and `resetTimer` functions, ensuring the timer is always cleared and restarted at the right moments. Added logic to disable input and buttons when time runs out, preventing race conditions.
+
+### Sound Integration
+
+- **Issue:**  
+  Integrating sound effects (using HTML `<audio>` and GSAP) caused issues with overlapping sounds and inconsistent feedback.
+
+- **Solution:**  
+  Added logic to pause and reset audio elements before playing them, and coordinated sound triggers with animation feedback. Ensured that sound effects are only played once per event, and background music can be toggled reliably.
+
+### Other Notable Fixes
+
+- Improved code comments to clarify the role of each section and function.
+- Enhanced input validation to prevent empty or duplicate submissions.
+- Fixed UI bugs related to button states and progress display.
 
 ---
 
