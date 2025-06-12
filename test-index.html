@@ -743,6 +743,9 @@
         // Event listener to ensure the DOM is fully loaded before running script
         document.addEventListener('DOMContentLoaded', () => {
             // --- DOM Element Selections ---
+            // This section gathers references to all key DOM elements used throughout the game.
+            // By centralizing these selections, the code can efficiently update the UI, manage state, and respond to user actions.
+            // This modular approach also makes the codebase easier to maintain and extend, as all UI hooks are in one place.
             // Get references to all main containers
             const preGameContainer = document.getElementById('pre-game-container');
             const instructionsContainer = document.getElementById('instructions-container');
@@ -800,6 +803,9 @@
             // --- End of DOM Element Selections ---
 
             // --- Question Bank ---
+            // The question bank is the core data source for the game, containing all emoji riddles, answers, and hints.
+            // Organizing questions by difficulty enables scalable gameplay and easy future expansion.
+            // This structure supports level progression and ensures a varied challenge for players.
             // Object containing questions categorized by difficulty
             const questions = {
                 easy: [
@@ -832,6 +838,9 @@
             // --- End of Question Bank ---
 
             // --- Game State Variables ---
+            // These variables track the current state of the game, such as score, lives, timer, and progress.
+            // By keeping state separate from UI logic, the game can be reset, advanced, or modified without side effects.
+            // This separation is crucial for debugging, testing, and adding new features like leaderboards or multiplayer.
             let currentQuestions = []; // Array to hold questions for the current game
             let currentQuestionIndex = 0; // Index of the current question
             let score = 0; // Player's score
@@ -846,6 +855,9 @@
             // --- End of Game State Variables ---
 
             // --- Animation Setup ---
+            // This section creates dynamic visual effects, such as background color changes and floating emojis.
+            // Animations enhance user engagement, provide visual feedback, and make the game feel lively and modern.
+            // The modular animation functions allow for easy adjustment of visual style and performance tuning.
             const backgroundColors = ['#FFD700', '#1E90FF', '#32CD32', '#FF4500']; // Gold, Blue, Green, Red
             let currentColorIndex = 0;
 
@@ -962,6 +974,9 @@
 
 
             // --- Form Validation Functions ---
+            // These functions ensure that user input is valid before allowing progression in the game.
+            // By validating forms early, the game prevents errors, improves user experience, and maintains data integrity.
+            // This also helps guide users through the intended flow, reducing confusion and frustration.
             // Validates the pre-game form (name, age, gender)
             function validatePreGameForm() {
                 // Enable continue button only if all fields are filled
@@ -985,6 +1000,9 @@
             // --- End of Form Validation Functions ---
 
             // --- Event Listeners ---
+            // Event listeners connect user actions (clicks, input, keypresses) to game logic.
+            // This section defines how the game responds to every interactive element, ensuring a responsive and intuitive UI.
+            // Centralizing event listeners makes it easy to add, remove, or modify controls as the game evolves.
             // Pre-game form input listeners
             nameInput.addEventListener('input', validatePreGameForm);
             ageInput.addEventListener('input', validatePreGameForm);
@@ -1029,6 +1047,9 @@
             // --- End of Event Listeners ---
 
             // --- Navigation Functions ---
+            // Navigation functions manage transitions between different screens (pre-game, instructions, game, summary).
+            // They ensure a smooth, logical flow for the player and handle state resets as needed.
+            // This modularity supports future enhancements like additional screens or onboarding tutorials.
             // Shows the instructions screen and hides the pre-game screen
             function showInstructions() {
                 preGameContainer.classList.add('hidden');
@@ -1086,6 +1107,9 @@
             // --- End of Navigation Functions ---
 
             // --- Core Game Logic Functions ---
+            // This section contains the main mechanics of the game: starting, progressing, checking answers, hints, and ending.
+            // Each function is responsible for a specific aspect of gameplay, making the code easy to read and debug.
+            // By isolating core logic, the game can be extended (e.g., new modes, power-ups) without breaking existing features.
             // Initializes and starts the game
             function startGame() {
                 instructionsContainer.classList.add('hidden');
@@ -1374,6 +1398,9 @@
             // --- End of Core Game Logic Functions ---
 
             // --- UI Update Functions ---
+            // UI update functions keep the visual state in sync with the underlying game state.
+            // They ensure that score, lives, and progress are always accurately displayed to the player.
+            // This separation allows for consistent updates and easier UI redesigns in the future.
             // Updates the score display on the screen
             function updateScore() {
                 scoreDisplay.textContent = `Score: ${score}`;
@@ -1392,6 +1419,9 @@
             // --- End of UI Update Functions ---
 
             // --- Timer Functions ---
+            // Timer functions manage the countdown for each question, enforcing time-based challenge and urgency.
+            // They handle starting, updating, and clearing the timer, and trigger timeouts when needed.
+            // This modular approach allows for easy adjustment of time limits and supports features like difficulty scaling.
             // Starts the timer for the current question
             function startTimer() {
                 const timeLimit = difficultySelect.value === 'hard' ? 20 : 30; // Set time based on difficulty
@@ -1413,6 +1443,9 @@
             // --- End of Timer Functions ---
             
             // --- Sound and Music Functions ---
+            // This section controls all audio feedback, including sound effects and background music.
+            // Sound enhances the emotional impact of game events (correct/incorrect answers, level completion) and increases immersion.
+            // Modular sound functions make it easy to add new effects, support toggling, and ensure accessibility for all users.
             // Plays a sound effect (correct or incorrect)
             function playSound(type) {
                 if (Tone && isMusicPlaying) { // Check if Tone.js is loaded and music is enabled

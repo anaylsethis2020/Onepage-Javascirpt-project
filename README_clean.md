@@ -185,6 +185,90 @@ and a user-friendly design to deliver an engaging experience.
 
 ---
 
+# 🎮 EMOJI COUNTRY QUIZ GAME — FEATURES & OPERATIONS CHECKLIST
+
+## ✅ Core Features
+
+1. **User Interface Layout**
+   - Retain existing CSS layout unless bug fixes are required.
+   - Responsive layout optimized for Chrome.
+   - Minimal layout changes unless necessary for functionality.
+
+2. **Language Selector**
+   - Dropdown or sidebar list for language selection.
+   - One selected language must persist throughout the session.
+   - Prevent duplicate selection buttons.
+
+3. **User Input Form (Pre-Game)**
+   - Name input field.
+   - Age confirmation (optional).
+   - Language selection (mandatory before continuing).
+   - ‘Continue’ button activates **only** after all required fields are filled.
+
+4. **Game Window**
+   - Displays one emoji-country riddle at a time.
+   - Text input field for guesses.
+   - Submit button for answer checking.
+   - ‘Next’ button appears only after feedback is displayed.
+   - Animated feedback (`✅ correct / ❌ incorrect`).
+
+5. **Score Tracking**
+   - Visual score counter (correct answers only).
+   - Local scoring system using vanilla JavaScript.
+   - Optional: Firebase Firestore integration for score history.
+
+6. **Game Timer**
+   - Countdown starts upon game initiation.
+   - Timer visually displayed.
+   - Automatic end when timer hits 0.
+
+7. **Game Summary Screen**
+   - Displays final score.
+   - Restart option available.
+   - Optional: Save score with initials (if Firebase is used).
+
+8. **Difficulty Levels**
+   - Three selectable difficulties: **Easy, Medium, Hard**.
+   - Hard mode applies stricter time limits and fewer hints.
+
+9. **Lives System**
+   - Each player gets **three lives per level**.
+   - Losing all lives ends the round early.
+   - Lives reset when advancing to a new level.
+
+10. **Sound Effects & Background Music**
+   - Uses **Tone.js** for interactive sounds.
+   - Background music can be toggled **on/off** in settings.
+   - Sound feedback for correct/incorrect answers.
+
+11. **Firebase Firestore Integration**
+   - Stores player name, score, language, and timestamp.
+   - Displays top five leaderboard scores.
+   - Input sanitization to prevent invalid submissions.
+
+12. **Form Validation & Input Handling**
+   - Prevent empty submissions.
+   - Validate text answers (case insensitive).
+   - Auto-clear input field after submission.
+
+13. **Game Flow Logic**
+    - Starts only after required inputs (name, age, mode selection).
+      - **Function:** `startGame()` — This function is only called when all pre-game fields are valid and the user clicks Start. It initializes the game state, sets up the first question, and ensures the player cannot proceed without entering required information.
+    - Operates question-by-question.
+      - **Functions:** `loadQuestion()`, `checkAnswer()`, `nextQuestion()` — `loadQuestion()` displays the current riddle, `checkAnswer()` processes the user's input and feedback, and `nextQuestion()` advances to the next riddle, ensuring a clear, stepwise progression.
+    - Timer resets each round (30s per question).
+      - **Functions:** `startTimer()`, `resetTimer()` — These manage the countdown for each question, resetting and starting the timer as each new riddle is loaded, enforcing time pressure and fairness.
+    - Auto-advance to next question if timer runs out (+1 incorrect score).
+      - **Function:** `handleTimeout()` — When the timer reaches zero, this function marks the answer as incorrect, updates the score/lives, and prompts the player to move to the next question, maintaining game flow even if the player is inactive.
+    - Prevents resubmission bugs by disabling buttons after interactions.
+      - **Functions:** `checkAnswer()`, `handleTimeout()` — Both functions disable the submit button and input field after an answer is processed or time runs out, preventing duplicate submissions and ensuring game integrity.
+    - Displays real-time progress (`Question X of Y`).
+      - **Function:** `loadQuestion()` — Updates the progress display each time a new question is loaded, giving the player a clear sense of advancement and remaining riddles.
+    - Smooth transitions between questions, score updates, and game-end states.
+      - **Functions:** `loadQuestion()`, `endGame()`, `displayCelebrationAnimation()` — These functions handle UI updates, feedback, and celebratory effects, ensuring the player experiences seamless transitions and clear feedback throughout the game.
+
+---    
+
 ## ⚙️ Development & Tech Stack
 
 - **JavaScript (Vanilla)** for logic and DOM manipulation
