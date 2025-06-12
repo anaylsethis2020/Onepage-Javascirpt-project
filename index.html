@@ -4,18 +4,586 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emoji Riddle Quiz</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
-    <!-- External CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
-    <!-- GSAP for animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- Tone.js for audio handling -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <!-- Main script -->
-    <script defer src="assets/js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- GSAP Library -->
+    <!-- Start of CSS Styles -->
+    <style>
+        /* Basic body styling */
+        body {
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column; /* Stack main content and footer vertically */
+            justify-content: space-between; /* Push footer to bottom */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #FFF44F; /* Lemon Yellow background */
+            color: #000000; /* Black text */
+            overflow-x: hidden; /* Prevent horizontal scrollbars, allow vertical for main content */
+            transition: background-color 1s ease; /* Smooth background color transition */
+        }
+
+        #main-app-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%; /* Ensure it takes full width */
+            flex-grow: 1; /* Allow main content to grow and push footer down */
+            overflow-y: auto; /* Allow vertical scrolling for this container */
+            padding: 1em 0; /* Add some padding for scrollable content */
+        }
+
+        /* Styling for all main containers (pre-game, game, summary, instructions) */
+        #pre-game-container, #game-container, #summary-container, #instructions-container {
+            background: #FFFFFF; /* White card background */
+            padding: 2em;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid #eef;
+            transition: all 0.3s ease;
+            z-index: 1; /* Ensure containers are above the background animations */
+            position: relative; /* Needed for z-index to work */
+        }
+
+        /* Pre-game container specific styles */
+        #pre-game-container h1 {
+            font-family: 'Fredoka One', cursive;
+            color: #1E90FF; /* Electric Blue */
+            margin-bottom: 1em;
+        }
+
+        /* Style for the subtitle in pre-game container */
+        .pre-game-subtitle {
+            font-family: 'Fredoka One', cursive; /* Match main title font */
+            font-size: 1.2em; /* Slightly larger */
+            color: #FF6347; /* Tomato Red - a warm, inviting color */
+            margin-bottom: 1.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow */
+            font-style: normal; /* Remove italic if not desired with this font */
+        }
+
+        #pre-game-container label {
+            display: block; /* Make labels take full width */
+            margin-top: 1em;
+            margin-bottom: 0.25em;
+            text-align: left; /* Align label text to the left */
+            font-weight: bold;
+            color: #000000; /* Black text */
+        }
+
+        #pre-game-container input, #pre-game-container select {
+            width: calc(100% - 1.8em); /* Adjust width to account for padding */
+            padding: 0.9em;
+            margin-bottom: 1em; /* Add margin below each input/select */
+            border-radius: 8px;
+            border: 1px solid #FF6347; /* Changed border color to Tomato Red */
+            font-size: 1em;
+            font-family: "Segoe UI", sans-serif;
+            background-color: #eef1f5; /* Reverted to light greyish-blue background */
+        }
+
+        #pre-game-container input:focus, #pre-game-container select:focus {
+            border-color: #1E90FF; /* Electric Blue */
+            box-shadow: 0 0 8px rgba(30, 144, 255, 0.3); /* Lighter Electric Blue shadow */
+        }
+
+        #pre-game-container #continue-button {
+            background-color: #1E90FF; /* Electric Blue */
+            color: #FFFFFF; /* White text */
+            font-family: "Segoe UI", sans-serif;
+            font-weight: bold;
+            width: 100%; /* Make button full width */
+            padding: 1em;
+            margin-top: 1.5em;
+        }
+        #pre-game-container #continue-button:disabled {
+            background-color: #a0a0a0; /* Grey out when disabled */
+            border-color: #a0a0a0;
+        }
+
+
+        /* Specific styling for the instructions container */
+        #instructions-container {
+            max-width: 600px; /* Wider for more content */
+            text-align: left; /* Align text to left for readability */
+        }
+
+        #instructions-container h2 {
+            text-align: center; /* Center the main header */
+            margin-bottom: 1em;
+        }
+
+        #instructions-container h3 {
+            font-family: 'Segoe UI', sans-serif; /* Segoe UI for subheadings */
+            color: #000000; /* Black text */
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+
+        #instructions-container ul {
+            list-style-position: inside; /* Bullets inside the text block */
+            padding-left: 0; /* Remove default padding */
+            margin-bottom: 1em;
+            font-family: 'Segoe UI', sans-serif;
+            color: #000000; /* Black text */
+        }
+
+        #instructions-container li {
+            margin: 0.5em 0;
+            line-height: 1.6;
+        }
+
+        #instructions-container strong {
+            color: #1E90FF; /* Electric blue for emphasis */
+        }
+
+        /* Styling for the example box */
+        #instructions-container .example-box {
+            background: #f0f0f0; /* Light grey, distinct from Lemon Yellow background */
+            padding: 1em;
+            border-radius: 8px;
+            margin: 1em 0;
+            text-align: center;
+        }
+        #instructions-container .example-box .emoji-example {
+            font-family: 'Fredoka One', cursive; /* Fredoka One for emojis */
+            font-size: 2.5em;
+            margin-bottom: 0.25em;
+            color: #000000;
+        }
+        #instructions-container .example-box .answer-example {
+            color: #1E90FF; /* Electric Blue for the answer */
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #instructions-container .example-box .explanation-example {
+            font-size: 0.9em;
+            color: #333333; /* Darker grey for explanation */
+            margin-top: 0.25em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        #instructions-container #difficulty-select {
+            width: calc(100% - 1.8em); /* Match pre-game inputs */
+            padding: 0.9em;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            border-radius: 8px;
+            border: 1px solid #FF6347; /* Changed border color to Tomato Red */
+            font-size: 1em;
+            font-family: "Segoe UI", sans-serif;
+            background-color: #eef1f5; /* Reverted to light greyish-blue background */
+            color: #000000; /* Black text */
+        }
+
+        #instructions-container #difficulty-select:focus {
+            border-color: #1E90FF; /* Electric Blue */
+            box-shadow: 0 0 8px rgba(30, 144, 255, 0.3);
+        }
+
+        #instructions-container .button-group {
+            display: flex; /* Arrange buttons in a row */
+            justify-content: space-between; /* Space them out */
+            margin-top: 1.5em;
+        }
+
+        #instructions-container #start-button,
+        #instructions-container #back-button {
+            font-family: "Segoe UI", sans-serif;
+            font-weight: bold;
+            padding: 1em;
+            width: 48%; /* Adjust width for two buttons */
+        }
+
+        #instructions-container #start-button {
+            background-color: #1E90FF; /* Electric Blue */
+            color: #FFFFFF; /* White text */
+        }
+        #instructions-container #start-button:disabled {
+            background-color: #a0a0a0;
+            border-color: #a0a0a0;
+        }
+
+        #instructions-container #back-button {
+            background-color: #6c757d; /* Grey for back button */
+            color: #FFFFFF; /* White text */
+        }
+
+        /* Styling for the main game container */
+        #game-container {
+            /* display: flex; flex-direction: column; is already set */
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        /* Styling for the top bar in the game container */
+        #top-bar {
+            /* display: flex; justify-content: space-between; is already set */
+            align-items: center; /* Vertically align items in top-bar */
+            margin-bottom: 1.5em;
+            font-size: 1em; /* Adjusted for better fit */
+            font-weight: bold; /* Make text bold */
+            color: #000000; /* Black text */
+            width: 100%; /* Ensure top-bar takes full width */
+        }
+
+        #score-info-block {
+            display: flex; /* Arrange items horizontally */
+            justify-content: space-around; /* Distribute space around items */
+            width: 100%; /* Ensure the block takes available width */
+            gap: 0.5em; /* Add a small gap between the flex items */
+        }
+
+        #score-info-block div {
+            flex-grow: 1; /* Allow items to grow and share space */
+            flex-basis: 0; /* Distribute space evenly */
+            margin-bottom: 4px; /* Space between score lines */
+            font-size: 0.9em;
+            border: 1px solid #000000; /* Black border */
+            padding: 0.5em; /* Adjusted Padding inside the border */
+            border-radius: 8px; /* More rounded corners for the frame */
+            margin-top: 0.3em; /* Space above each framed element */
+            text-align: center; /* Center text within each box */
+        }
+
+        #score {
+            font-size: 1.1em; /* Slightly larger main score */
+            color: #000000;
+            background-color: #e0f7fa; /* Light blue background */
+        }
+
+        #correct-answers {
+            color: #155724; /* Darker Green for text for better contrast */
+            background-color: #d4edda; /* Light green background */
+        }
+
+        #incorrect-answers {
+            color: #721c24; /* Darker Red for text for better contrast */
+            background-color: #f8d7da; /* Light red background */
+        }
+        
+        #difficulty-display {
+            color: #000000; /* Black text */
+        }
+
+        #lives {
+            color: #dc3545; /* Red for lives (hearts are already red) */
+            font-size: 1.1em;
+        }
+        
+        #timer {
+            color: #1E90FF; /* Electric Blue for timer */
+            font-size: 1.1em;
+        }
+
+        /* Styling for the riddle container */
+        #riddle-container {
+            margin-bottom: 1.5em;
+        }
+
+        #emoji-clue {
+            font-family: 'Fredoka One', cursive; /* Fredoka One for emojis */
+            font-size: 4.5em; /* Slightly reduced for balance */
+            margin: 0.4em 0;
+            color: #000000; /* Black for emojis */
+            text-shadow: none; /* Remove previous text-shadow if not desired */
+        }
+
+        #question-progress {
+            font-size: 0.9em;
+            color: #555555; /* Dark grey for progress text */
+            margin-top: 0.5em;
+        }
+
+        /* Styling for the answer input field */
+        #answer-input {
+            width: calc(100% - 1.8em); /* Match other inputs */
+            padding: 0.9em;
+            margin-bottom: 1em;
+            border-radius: 8px;
+            border: 1px solid #FF6347; /* Changed border color to Tomato Red */
+            font-size: 1em;
+            font-family: "Segoe UI", sans-serif;
+            text-align: center; /* Center placeholder and input text */
+            background-color: #eef1f5; /* Reverted to light greyish-blue background */
+        }
+        #answer-input:focus {
+            border-color: #1E90FF; /* Electric Blue */
+            box-shadow: 0 0 8px rgba(30, 144, 255, 0.3);
+        }
+
+        /* Styling for the game buttons area */
+        #game-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
+            gap: 0.5em; /* Space between buttons */
+            margin-top: 1em;
+        }
+
+        #game-buttons button {
+            padding: 0.8em 1.2em; /* Adjusted padding */
+            font-size: 0.9em;
+            font-weight: bold;
+            width: 100%;
+            margin: 0;
+            font-family: "Segoe UI", sans-serif; /* Explicitly set font */
+            color: #FFFFFF; /* White text */
+            background-color: #FF6347; /* Tomato Red background */
+            border: none; /* Remove borders */
+            border-radius: 25px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+            transition: all 0.2s ease-in-out; /* Smooth transition for hover/active */
+        }
+
+        /* Ensure hover/active effects from general button styles still work well */
+        #game-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #game-buttons button:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Individual Game Button Colors */
+        #submit-button { background-color: #28a745; /* Green */ }
+        #next-button { background-color: #007bff; /* Blue */ }
+        #hint-button { background-color: #fd7e14; /* Orange */ }
+        #restart-level-button { 
+            background-color: #ffc107; /* Yellow */
+            color: #212529; /* Dark text for better contrast on yellow */
+        }
+        #new-game-from-game-button { background-color: #17a2b8; /* Teal */ }
+        #exit-game-button { background-color: #1E90FF; /* Electric Blue */ }
+
+
+        /* Styling for the feedback message display */
+        #feedback {
+            margin-top: 1.5em;
+            font-size: 1.2em; /* Adjusted size */
+            min-height: 1.5em; 
+            font-weight: bold;
+            font-family: "Segoe UI", sans-serif;
+        }
+        /* Feedback specific colors are handled by JS, but default can be set */
+        #feedback.correct {
+            color: #28a745; /* Green for correct */
+        }
+        #feedback.incorrect {
+            color: #dc3545; /* Red for incorrect */
+        }
+        #feedback.hint {
+            color: #fd7e14; /* Orange for hint */
+        }
+
+        /* Utility class to hide elements */
+        .hidden {
+            display: none !important; /* !important to override other display properties */
+        }
+        
+        /* Styling for the music toggle button */
+        #music-toggle {
+            position: fixed; /* Fixed position on the screen */
+            top: 15px;
+            right: 15px;
+            background: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            width: auto; /* Auto width based on content */
+            padding: 8px 12px;
+            border-radius: 50px; /* Circular button */
+            z-index: 1000; /* Ensure music toggle is above animations */
+        }
+
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 0.05em 0; /* Reduced padding */
+            margin-top: auto; /* Pushes footer to the bottom if content is short */
+            font-size: 1em; /* Increased font size */
+            font-weight: bold; /* Added boldness */
+            color: #555;
+            border-top: 3px solid #000000; /* Thick black border */
+            background-color: #FFFFFF; /* White background for footer */
+            width: 100%; /* Make footer span full width */
+            z-index: 1; /* Ensure footer is above the background animations */
+            position: relative; /* Needed for z-index to work */
+        }
+
+        /* Styles for animated emojis */
+        .floating-emoji {
+            position: fixed; /* Changed to fixed to float over all content */
+            font-size: 2em; /* Adjust size as needed */
+            user-select: none; /* Prevent selection */
+            z-index: 0; /* Behind content but above background */
+            opacity: 0; /* Start invisible for fade-in */
+        }
+
+        /* Styles for summary buttons */
+        .summary-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white; /* Default text color */
+            cursor: pointer;
+            margin: 10px auto; /* 10px top/bottom, auto left/right for centering */
+            text-align: center;
+            display: block; /* Allows for width and margin:auto centering */
+            width: 70%;     /* Percentage of its container's width */
+            max-width: 300px; /* Maximum width to prevent buttons from becoming too large */
+            transition: opacity 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+        }
+
+        .summary-button:hover {
+            opacity: 0.85; /* Slight fade on hover */
+            transform: translateY(-2px); /* Subtle lift effect on hover */
+        }
+
+        /* About Section Styles */
+        #about-container {
+            background-color: rgba(255, 255, 255, 0.95); /* Light, slightly transparent background */
+            color: #333; /* Darker text for readability */
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            text-align: center; /* Center align the content */
+            margin: 20px auto;
+            max-width: 700px; /* Max width for better readability */
+            border: 2px solid #FFD700; /* Gold border */
+            z-index: 1; /* Ensure it's above background animations */
+            position: relative;
+        }
+
+        #about-container h2 {
+            color: #1E90FF; /* Blue heading */
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #about-container p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            text-align: left; /* Align paragraphs to the left for readability */
+            color: #555; /* Slightly lighter text color for paragraphs */
+        }
+
+        #about-container strong {
+            color: #32CD32; /* Green for emphasis */
+        }
+
+        #about-container .highlight {
+            color: #FF4500; /* Red for other highlights */
+            font-weight: bold;
+        }
+
+        #about-container ul {
+            list-style-type: none; /* Remove default bullets */
+            padding-left: 0;
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        #about-container ul li {
+            padding-left: 1.5em;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        #about-container ul li::before {
+            content: '🌟'; /* Star emoji as bullet */
+            position: absolute;
+            left: 0;
+            font-size: 1em;
+        }
+
+        .about-button-style {
+            background-color: #17a2b8; /* Teal background color */
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Space above the button */
+        }
+
+        .about-button-style:hover {
+            background-color: #138496; /* Darker teal on hover */
+        }
+
+        /* Aircraft Banner Styles */
+        #aircraft-banner-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100px; /* Fixed height for the banner */
+            overflow: hidden;
+            margin-bottom: 1.5em; /* Space below the banner */
+        }
+
+        #plane {
+            position: absolute;
+            top: 10px; /* Adjusted vertical position */
+            left: 0;
+            font-size: 2.5em;
+            animation: fly 10s linear infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateX(-100px) rotate(0deg); }
+            100% { transform: translateX(100vw) rotate(360deg); }
+        }
+
+        #banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1;
+        }
+
+        #banner-text {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1.2em;
+            color: #333;
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #aircraft-banner-wrapper {
+                height: 80px; /* Reduced height on smaller screens */
+            }
+
+            #plane {
+                font-size: 2em;
+            }
+
+            #banner {
+                padding: 8px 16px;
+            }
+
+            #banner-text {
+                font-size: 1em;
+            }
+        }
+    </style>
 </head>
 <body>
     <main id="main-app-content">
@@ -148,13 +716,6 @@
             </div>
             <!-- Feedback Area: Displays if the answer was correct or incorrect -->
             <div id="feedback"></div>
-
-            <!-- Audio Elements for Sound Effects -->
-            <audio id="correct-sound" src="assets/sounds/correct.mp3" preload="auto"></audio>
-            <audio id="incorrect-sound" src="assets/sounds/incorrect.mp3" preload="auto"></audio>
-            <audio id="click-sound" src="assets/sounds/click.mp3" preload="auto"></audio>
-            <audio id="gameover-sound" src="assets/sounds/gameover.mp3" preload="auto"></audio>
-            <audio id="levelup-sound" src="assets/sounds/levelup.mp3" preload="auto"></audio>
         </div>
 
         <!-- Summary Container: Displays game over message and final score -->
@@ -166,11 +727,815 @@
             <button id="exit-game-summary-button" class="summary-button" style="background-color: #dc3545; color: white;">Exit Game</button>
         </div>
 
+        <!-- Music Toggle Button: Allows user to turn music on/off -->
+        <button id="music-toggle">🎵 Sound: OFF</button>
     </main>
 
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Abel Beyene - Emoji Riddle Quiz</p>
     </footer>
+
+    <!-- External library for sound effects (Tone.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <!-- Start of JavaScript Game Logic -->
+    <script>
+        // Event listener to ensure the DOM is fully loaded before running script
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selections ---
+            // This section gathers references to all key DOM elements used throughout the game.
+            // By centralizing these selections, the code can efficiently update the UI, manage state, and respond to user actions.
+            // This modular approach also makes the codebase easier to maintain and extend, as all UI hooks are in one place.
+            // Get references to all main containers
+            const preGameContainer = document.getElementById('pre-game-container');
+            const instructionsContainer = document.getElementById('instructions-container');
+            const gameContainer = document.getElementById('game-container');
+            const summaryContainer = document.getElementById('summary-container');
+
+            // Initial visibility setup: Show pre-game, hide others
+            preGameContainer.classList.remove('hidden');
+            instructionsContainer.classList.add('hidden');
+            gameContainer.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+
+            // Get references to pre-game form elements
+            const nameInput = document.getElementById('name-input');
+            const ageInput = document.getElementById('age-input');
+            const genderSelect = document.getElementById('gender-select');
+            const continueButton = document.getElementById('continue-button');
+
+            // Get references to instructions screen elements
+            const difficultySelect = document.getElementById('difficulty-select');
+            const startButton = document.getElementById('start-button');
+            const backButton = document.getElementById('back-button');
+
+            // Get references to game screen elements
+            const scoreDisplay = document.getElementById('score');
+            const correctAnswersDisplay = document.getElementById('correct-answers'); // Added for correct count
+            const incorrectAnswersDisplay = document.getElementById('incorrect-answers'); // Added for incorrect count
+            const difficultyDisplay = document.getElementById('difficulty-display'); // Added difficulty display
+            const livesDisplay = document.getElementById('lives');
+            const timerDisplay = document.getElementById('timer');
+            const emojiClueDisplay = document.getElementById('emoji-clue');
+            const questionProgressDisplay = document.getElementById('question-progress');
+            const answerInput = document.getElementById('answer-input');
+            const submitButton = document.getElementById('submit-button');
+            const nextButton = document.getElementById('next-button');
+            const feedbackDisplay = document.getElementById('feedback');
+            const restartLevelButton = document.getElementById('restart-level-button'); 
+            const newGameFromGameButton = document.getElementById('new-game-from-game-button'); 
+            const hintButton = document.getElementById('hint-button'); // Added Hint button
+            const exitGameButton = document.getElementById('exit-game-button'); // Added Exit Game button
+
+            // Get reference to music toggle button
+            const musicToggleButton = document.getElementById('music-toggle');
+
+            // Get references to summary screen elements
+            const finalScoreDisplay = document.getElementById('final-score');
+            const newGameButton = document.getElementById('new-game-button'); 
+            const nextLevelButton = document.getElementById('next-level-button'); // Added Next Level button
+            const exitGameSummaryButton = document.getElementById('exit-game-summary-button'); // Added Exit Game button for summary
+
+            // Get reference to about container and buttons
+            const aboutContainer = document.getElementById('about-container');
+            const showAboutButton = document.getElementById('show-about-button');
+            const backToPreGameButton = document.getElementById('back-to-pregame-button');
+            // --- End of DOM Element Selections ---
+
+            // --- Question Bank ---
+            // The question bank is the core data source for the game, containing all emoji riddles, answers, and hints.
+            // Organizing questions by difficulty enables scalable gameplay and easy future expansion.
+            // This structure supports level progression and ensures a varied challenge for players.
+            // Object containing questions categorized by difficulty
+            const questions = {
+                easy: [
+                    { emoji: "🇯 🍳", answer: "japan", hint: "Island nation in East Asia, capital is Tokyo." },
+                    { emoji: "👙💤🤧", answer: "brazil", hint: "Largest country in South America, famous for samba." },
+                    { emoji: "🔗🅰️", answer: "china", hint: "Most populous country, known for the Great Wall." },
+                    { emoji: "4️⃣🐜🐜", answer: "france", hint: "European country, home to the Eiffel Tower." },
+                    { emoji: "🍐🦘", answer: "peru", hint: "South American country, site of Machu Picchu." }
+                ],
+                medium: [
+                    { emoji: "🧊🅰️", answer: "cuba", hint: "Caribbean island nation, capital Havana." },
+                    { emoji: "🍳🅰️🤰", answer: "panama", hint: "Connects North and South America, has a famous canal." },
+                    { emoji: "🐄🪨🅾️", answer: "morocco", hint: "North African kingdom, borders the Atlantic and Mediterranean." },
+                    { emoji: "🐋🐬", answer: "wales", hint: "Part of the United Kingdom, known for its castles." },
+                    { emoji: "👖✅", answer: "denmark", hint: "Scandinavian country, home of LEGO." },
+                    { emoji: "⚓🇺⚽", answer: "portugal", hint: "Located on the Iberian Peninsula, west of Spain." },
+                    { emoji: "🧍‍♂️🅰️", answer: "kenya", hint: "East African country, famous for wildlife safaris." }
+                ],
+                hard: [
+                    { emoji: "🆕💤🖼️", answer: "new zealand", hint: "Island country in the southwestern Pacific Ocean." },
+                    { emoji: "📩🦌🦵🅰️", answer: "indonesia", hint: "Archipelago of over 17,000 islands in Southeast Asia." },
+                    { emoji: "💈🖼️", answer: "poland", hint: "Central European country, capital is Warsaw." },
+                    { emoji: "👁🏃", answer: "iran", hint: "Middle Eastern country, formerly known as Persia." },
+                    { emoji: "🎤🅰️🫖", answer: "singapore", hint: "Island city-state off southern Malaysia." },
+                    { emoji: "🍭🍬👖", answer: "sweden", hint: "Scandinavian nation with thousands of coastal islands." },
+                    { emoji: "S👂🐝🅰️", answer: "serbia", hint: "Landlocked country in Southeast Europe." },
+                    { emoji: "😡⛽🚗", answer: "madagascar", hint: "Large island nation off the southeast coast of Africa." }
+                ]
+            };
+            // --- End of Question Bank ---
+
+            // --- Game State Variables ---
+            // These variables track the current state of the game, such as score, lives, timer, and progress.
+            // By keeping state separate from UI logic, the game can be reset, advanced, or modified without side effects.
+            // This separation is crucial for debugging, testing, and adding new features like leaderboards or multiplayer.
+            let currentQuestions = []; // Array to hold questions for the current game
+            let currentQuestionIndex = 0; // Index of the current question
+            let score = 0; // Player's score
+            let lives = 3; // Player's lives
+            let timer; // Interval ID for the question timer
+            let timeLeft = 30; // Time remaining for the current question
+            let correctAnswersCount = 0; // Added for correct count
+            let incorrectAnswersCount = 0; // Added for incorrect count
+            let musicPlayer; // Tone.js synth instance for music/sound
+            let isMusicPlaying = false; // Flag to track music state
+            let hintUsedThisQuestion = false; // Flag to track if hint was used for the current question
+            // --- End of Game State Variables ---
+
+            // --- Animation Setup ---
+            // This section creates dynamic visual effects, such as background color changes and floating emojis.
+            // Animations enhance user engagement, provide visual feedback, and make the game feel lively and modern.
+            // The modular animation functions allow for easy adjustment of visual style and performance tuning.
+            const backgroundColors = ['#FFD700', '#1E90FF', '#32CD32', '#FF4500']; // Gold, Blue, Green, Red
+            let currentColorIndex = 0;
+
+            function changeBackgroundColor() {
+                currentColorIndex = (currentColorIndex + 1) % backgroundColors.length;
+                document.body.style.backgroundColor = backgroundColors[currentColorIndex];
+            }
+            setInterval(changeBackgroundColor, 5000); // Change color every 5 seconds
+
+            const flagEmojis = ['🇺🇸', '🇧🇷', '🇯🇵', '🇫🇷', '🇨🇳', '🇬🇧', '🇮🇳', '🇨🇦', '🇦🇺', '🇩🇪'];
+            const generalEmojis = ['😀', '🎉', '🌟', '🚀', '💡', '🎯', '🏆', '🧩', '🧠', '⏰'];
+            const allEmojisForRain = [...flagEmojis, ...generalEmojis];
+
+            function createFloatingEmoji() {
+                const emoji = document.createElement('div');
+                emoji.classList.add('floating-emoji');
+                emoji.textContent = flagEmojis[Math.floor(Math.random() * flagEmojis.length)];
+                document.body.appendChild(emoji);
+
+                // Random starting position and animation properties
+                const startX = Math.random() * window.innerWidth;
+                const startY = window.innerHeight + 50; // Start below the screen
+                const endY = -100; // End above the screen
+                const duration = Math.random() * 5 + 5; // 5-10 seconds duration
+                const delay = Math.random() * 3; // Stagger appearance
+
+                gsap.set(emoji, { x: startX, y: startY, opacity: 0 });
+                gsap.to(emoji, {
+                    y: endY,
+                    opacity: [0.8, 1, 0.8, 0], // Fade in, stay, fade out
+                    duration: duration,
+                    delay: delay,
+                    ease: "power1.inOut",
+                    onComplete: () => {
+                        emoji.remove(); // Remove emoji from DOM after animation
+                    }
+                });
+            }
+
+            // Create floating emojis at intervals
+            // Adjust interval for more or fewer emojis
+            setInterval(createFloatingEmoji, 2000); // Create a new floating emoji every 2 seconds
+
+
+            function createFallingEmoji() {
+                const emoji = document.createElement('div');
+                emoji.classList.add('floating-emoji'); // Can reuse some styling
+                emoji.textContent = allEmojisForRain[Math.floor(Math.random() * allEmojisForRain.length)];
+                emoji.style.fontSize = `${Math.random() * 1.5 + 1}em`; // Random size (1em to 2.5em)
+                document.body.appendChild(emoji);
+
+                let startX, startY, endX, endY;
+                const sideRoll = Math.random();
+
+                if (sideRoll < 0.6) { // 60% chance: Start from Top
+                    startX = Math.random() * window.innerWidth;
+                    startY = -50; // Start above screen
+                    // Emojis from top fall mostly downwards, with a horizontal drift
+                    endX = startX + (Math.random() - 0.5) * (window.innerWidth / 4); 
+                    endY = window.innerHeight + 50; // End below screen
+                    // Ensure endX is within reasonable screen bounds
+                    endX = Math.max(-100, Math.min(window.innerWidth + 100, endX));
+                } else if (sideRoll < 0.8) { // 20% chance: Start from Left
+                    startX = -50; // Start left of screen
+                    startY = Math.random() * window.innerHeight; // Random height on the left edge
+                    // Emojis from left fall diagonally towards the bottom right area
+                    endX = Math.random() * (window.innerWidth / 2) + (window.innerWidth / 2); // Target right half
+                    endY = window.innerHeight + 50; // End below screen
+                } else { // 20% chance: Start from Right
+                    startX = window.innerWidth + 50; // Start right of screen
+                    startY = Math.random() * window.innerHeight; // Random height on the right edge
+                    // Emojis from right fall diagonally towards the bottom left area
+                    endX = Math.random() * (window.innerWidth / 2); // Target left half
+                    endY = window.innerHeight + 50; // End below screen
+                }
+
+                const duration = Math.random() * 5 + 6; // Duration 6-11 seconds
+                const rotation = Math.random() * 360 - 180; // Random rotation
+
+                gsap.set(emoji, { x: startX, y: startY, opacity: 1, rotation: 0 });
+                gsap.to(emoji, {
+                    x: endX, // Animate x-coordinate
+                    y: endY, // Animate y-coordinate
+                    rotation: rotation,
+                    opacity: 0,
+                    duration: duration,
+                    ease: "power1.in", // Emojis accelerate as they fall
+                    onComplete: () => {
+                        emoji.remove();
+                    }
+                });
+            }
+
+            function startEmojiRain() {
+                createFallingEmoji();
+                requestAnimationFrame(startEmojiRain);
+            }
+
+            // Start the emoji rain - call it once to begin the loop
+            // To control the density, you might want to call createFallingEmoji on an interval
+            // instead of every frame, or add a conditional check inside startEmojiRain.
+            // For now, let's create one every few frames for a less dense effect.
+            let frameCount = 0;
+            function controlledEmojiRain() {
+                frameCount++;
+                if (frameCount % 10 === 0) { // Create an emoji roughly every 10 frames
+                    createFallingEmoji();
+                }
+                requestAnimationFrame(controlledEmojiRain);
+            }
+            controlledEmojiRain(); // Start the controlled rain
+
+            // --- End of Animation Setup ---
+
+
+            // --- Form Validation Functions ---
+            // These functions ensure that user input is valid before allowing progression in the game.
+            // By validating forms early, the game prevents errors, improves user experience, and maintains data integrity.
+            // This also helps guide users through the intended flow, reducing confusion and frustration.
+            // Validates the pre-game form (name, age, gender)
+            function validatePreGameForm() {
+                // Enable continue button only if all fields are filled
+                continueButton.disabled = !(nameInput.value.trim() && ageInput.value && genderSelect.value);
+            }
+
+            // Validates the instructions form (difficulty selection)
+            function validateInstructionsForm() {
+                const difficultySelected = difficultySelect.value;
+                // Enable start button only if difficulty is selected
+                startButton.disabled = !difficultySelected;
+
+                // Update the time limit display based on selected difficulty
+                const timeLimitSpan = document.getElementById('time-limit');
+                if (difficultySelected === 'hard') {
+                    timeLimitSpan.textContent = '20';
+                } else {
+                    timeLimitSpan.textContent = '30'; // Default for easy/medium
+                }
+            }
+            // --- End of Form Validation Functions ---
+
+            // --- Event Listeners ---
+            // Event listeners connect user actions (clicks, input, keypresses) to game logic.
+            // This section defines how the game responds to every interactive element, ensuring a responsive and intuitive UI.
+            // Centralizing event listeners makes it easy to add, remove, or modify controls as the game evolves.
+            // Pre-game form input listeners
+            nameInput.addEventListener('input', validatePreGameForm);
+            ageInput.addEventListener('input', validatePreGameForm);
+            genderSelect.addEventListener('change', validatePreGameForm);
+
+            // Instructions screen difficulty selection listener
+            difficultySelect.addEventListener('change', validateInstructionsForm);
+
+            // Button click listeners
+            continueButton.addEventListener('click', showInstructions); // Pre-game to Instructions
+            startButton.addEventListener('click', startGame);          // Instructions to Game
+            backButton.addEventListener('click', goBackToPreGame);      // Instructions to Pre-game
+            submitButton.addEventListener('click', checkAnswer);        // Submit answer in game
+            restartLevelButton.addEventListener('click', restartCurrentLevel);
+            newGameFromGameButton.addEventListener('click', returnToInstructionsFromGame);
+            hintButton.addEventListener('click', showHint); // Added listener for hint button
+            exitGameButton.addEventListener('click', exitToPreGame); // Added listener for exit game button
+            
+            // Answer input listener for 'Enter' key press
+            answerInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+            nextButton.addEventListener('click', nextQuestion);         // Go to next question
+            
+            newGameButton.addEventListener('click', returnToInstructions); // Added listener for new game (back to instructions)
+            nextLevelButton.addEventListener('click', startNextLevel); // Added listener for next level
+            exitGameSummaryButton.addEventListener('click', exitToPreGameFromSummary); // Listener for Exit Game from Summary
+            musicToggleButton.addEventListener('click', toggleMusic);   // Toggle background music
+
+            // About section button listeners
+            showAboutButton.addEventListener('click', () => {
+                preGameContainer.classList.add('hidden');
+                aboutContainer.classList.remove('hidden');
+            });
+
+            backToPreGameButton.addEventListener('click', () => {
+                aboutContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+            });
+            // --- End of Event Listeners ---
+
+            // --- Navigation Functions ---
+            // Navigation functions manage transitions between different screens (pre-game, instructions, game, summary).
+            // They ensure a smooth, logical flow for the player and handle state resets as needed.
+            // This modularity supports future enhancements like additional screens or onboarding tutorials.
+            // Shows the instructions screen and hides the pre-game screen
+            function showInstructions() {
+                preGameContainer.classList.add('hidden');
+                aboutContainer.classList.add('hidden'); // Ensure about is hidden too
+                instructionsContainer.classList.remove('hidden');
+                validateInstructionsForm(); // Ensure start button state is correct on show
+            }
+
+            // Shows the pre-game screen and hides the instructions screen
+            function goBackToPreGame() {
+                instructionsContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+            }
+
+            // Shows the instructions screen from the summary screen
+            function returnToInstructions() {
+                summaryContainer.classList.add('hidden');
+                instructionsContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden
+                validateInstructionsForm(); // Ensure start button state is correct
+            }
+
+            // Shows the instructions screen from the game screen
+            function returnToInstructionsFromGame() {
+                clearInterval(timer); // Stop the game timer
+                gameContainer.classList.add('hidden');
+                instructionsContainer.classList.remove('hidden');
+                validateInstructionsForm(); // Ensure start button state is correct
+            }
+
+            // Exits the game and returns to the pre-game screen
+            function exitToPreGame() {
+                clearInterval(timer); // Stop the game timer
+                gameContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+
+                // Reset pre-game form fields for a clean start
+                nameInput.value = '';
+                ageInput.value = '';
+                genderSelect.value = '';
+                validatePreGameForm(); // Update continue button state based on cleared form
+            }
+
+            // Exits the game from the summary screen and returns to the pre-game screen
+            function exitToPreGameFromSummary() {
+                summaryContainer.classList.add('hidden');
+                preGameContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden
+
+                // Reset pre-game form fields for a clean start
+                nameInput.value = '';
+                genderSelect.value = '';
+                validatePreGameForm(); // Update continue button state based on cleared form
+            }
+            // --- End of Navigation Functions ---
+
+            // --- Core Game Logic Functions ---
+            // This section contains the main mechanics of the game: starting, progressing, checking answers, hints, and ending.
+            // Each function is responsible for a specific aspect of gameplay, making the code easy to read and debug.
+            // By isolating core logic, the game can be extended (e.g., new modes, power-ups) without breaking existing features.
+            // Initializes and starts the game
+            function startGame() {
+                instructionsContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                hintUsedThisQuestion = false; 
+                hintButton.disabled = false;
+                
+                const difficulty = difficultySelect.value;
+                difficultyDisplay.textContent = `Difficulty: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`; // Display difficulty
+                currentQuestions = questions[difficulty]; // Select questions based on difficulty
+                currentQuestionIndex = 0;
+                score = 0;
+                lives = 3;
+                correctAnswersCount = 0; // Reset correct count
+                incorrectAnswersCount = 0; // Reset incorrect count
+                
+                updateScore(); // Initialize score display
+                updateLives(); // Initialize lives display
+                updateCorrectIncorrectDisplay(); // Initialize counts display
+                loadQuestion(); // Load the first question
+                nextLevelButton.classList.add('hidden'); // Ensure next level button is hidden when a new game starts
+            }
+
+            // Restarts the current level
+            function restartCurrentLevel() {
+                if (!gameContainer.classList.contains('hidden')) { 
+                    clearInterval(timer); 
+                    hintUsedThisQuestion = false; 
+                    hintButton.disabled = false;
+                    feedbackDisplay.textContent = ''; // Clear hint/feedback
+
+                    // Reset level-specific state
+                    currentQuestionIndex = 0;
+                    lives = 3; // Reset lives to full for the level
+                    correctAnswersCount = 0; // Reset correct count
+                    incorrectAnswersCount = 0; // Reset incorrect count
+
+                    // Update UI
+                    updateLives();
+                    updateCorrectIncorrectDisplay(); // Update counts display
+                    // Score is maintained, so no need to call updateScore unless it changes.
+                    // updateScore(); 
+
+                    // Load the first question of the current difficulty
+                    loadQuestion();
+                }
+            }
+
+            // Starts the next difficulty level, preserving lives and score
+            function startNextLevel() {
+                summaryContainer.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                nextLevelButton.classList.add('hidden'); // Hide it after click
+
+                let newDifficulty;
+                const currentDifficulty = difficultySelect.value;
+
+                if (currentDifficulty === 'easy') {
+                    newDifficulty = 'medium';
+                } else if (currentDifficulty === 'medium') {
+                    newDifficulty = 'hard';
+                } else {
+                    // This case should ideally not be reached if the button is managed correctly.
+                    // Fallback to instructions if somehow clicked after 'hard' or error.
+                    returnToInstructions(); 
+                    return;
+                }
+
+                difficultySelect.value = newDifficulty; // IMPORTANT: Update the actual select element
+                difficultyDisplay.textContent = `Difficulty: ${newDifficulty.charAt(0).toUpperCase() + newDifficulty.slice(1)}`;
+                currentQuestions = questions[newDifficulty];
+                currentQuestionIndex = 0;
+                // Lives and score are preserved from the previous level
+                correctAnswersCount = 0; // Reset counts for the new level
+                incorrectAnswersCount = 0; // Reset counts for the new level
+
+                updateScore(); // Update score display (score is preserved)
+                updateLives(); // Update lives display (lives are preserved)
+                updateCorrectIncorrectDisplay(); // Update counts display
+                loadQuestion(); // Load the first question of the new level
+            }
+
+            // Loads the current question or ends the game if no more questions
+            function loadQuestion() {
+                if (currentQuestionIndex < currentQuestions.length) {
+                    resetTimer(); 
+                    startTimer(); 
+                    hintUsedThisQuestion = false; 
+                    hintButton.disabled = false; 
+                    feedbackDisplay.textContent = ''; // Clear previous hint/feedback
+                    
+
+                    const question = currentQuestions[currentQuestionIndex];
+                    emojiClueDisplay.textContent = question.emoji;
+                    questionProgressDisplay.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+                    
+                    // Reset input and feedback fields
+                    answerInput.value = '';
+                    feedbackDisplay.textContent = '';
+                    feedbackDisplay.style.color = ''; // Reset feedback color
+                    answerInput.disabled = false;
+                    submitButton.disabled = false;
+                    nextButton.classList.add('hidden'); // Hide next button until answer is submitted
+                    answerInput.focus(); // Focus on the answer input field
+                } else {
+                    // All questions answered
+                    endGame("Congratulations!");
+                }
+            }
+
+            // Shows a hint for the current question, costs one life
+            function showHint() {
+                if (hintUsedThisQuestion) {
+                    feedbackDisplay.textContent = "Hint already used for this question.";
+                    feedbackDisplay.style.color = '#e74c3c';
+                    return;
+                }
+                if (lives <= 0) {
+                    feedbackDisplay.textContent = "No lives left for a hint!";
+                    feedbackDisplay.style.color = '#e74c3c';
+                    hintButton.disabled = true; // Disable if no lives at all
+                    return;
+                }
+
+                // This check is important to ensure there is a question loaded.
+                if (!currentQuestions || currentQuestionIndex >= currentQuestions.length) {
+                    feedbackDisplay.textContent = "No question loaded to give a hint for.";
+                    feedbackDisplay.style.color = '#e74c3c';
+                    return;
+                }
+
+                lives--;
+                updateLives();
+                playSound('incorrect'); // Using incorrect sound for losing a life
+
+                const hint = currentQuestions[currentQuestionIndex].hint;
+                feedbackDisplay.textContent = `💡 Hint: ${hint} (-1 Life)`;
+                feedbackDisplay.style.color = '#fd7e14'; // Orange color for hint message
+                hintUsedThisQuestion = true;
+                hintButton.disabled = true; 
+
+                if (lives === 0) {
+                    clearInterval(timer);
+                    answerInput.disabled = true;
+                    submitButton.disabled = true;
+                    nextButton.classList.remove('hidden');
+                    nextButton.focus(); 
+                    setTimeout(() => endGame("Game Over! Hint cost the last life."), 1500);
+                }
+            }
+
+            // Checks the player's answer against the correct answer
+            function checkAnswer() {
+                if (submitButton.disabled) return; // Prevent double submission if already processed
+                
+                clearInterval(timer); // Stop the timer
+                submitButton.disabled = true; // Disable submit button after an attempt
+                const userAnswer = answerInput.value.trim().toLowerCase();
+                const correctAnswer = currentQuestions[currentQuestionIndex].answer.toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    feedbackDisplay.textContent = '✅ Correct!';
+                    feedbackDisplay.style.color = '#2ecc71'; // Green for correct
+                    score++;
+                    correctAnswersCount++; // Increment correct count
+                    playSound('correct'); // Play correct answer sound
+                } else {
+                    feedbackDisplay.textContent = `❌ Incorrect! It\\'s ${correctAnswer}.`;
+                    feedbackDisplay.style.color = '#e74c3c'; // Red for incorrect
+                    lives--;
+                    incorrectAnswersCount++; // Increment incorrect count
+                    playSound('incorrect'); // Play incorrect answer sound
+                }
+
+                updateScore(); // Update score display
+                updateLives(); // Update lives display
+                updateCorrectIncorrectDisplay(); // Update counts display
+                answerInput.disabled = true; // Disable answer input
+                nextButton.classList.remove('hidden'); // Show next question button
+                nextButton.focus(); // Focus on next button
+
+                // Check if game over due to no lives
+                if (lives === 0) {
+                    setTimeout(() => endGame("Game Over!"), 2000); // Delay before showing summary
+                }
+            }
+            
+            // Handles the scenario when the timer runs out for a question
+            function handleTimeout() {
+                if (submitButton.disabled && answerInput.disabled) return; // Prevent double handling if already processed by checkAnswer
+                
+                clearInterval(timer); // Stop the timer
+                feedbackDisplay.textContent = "❌ Time\'s up!";
+                feedbackDisplay.style.color = '#e74c3c'; // Red for timeout
+                lives--;
+                incorrectAnswersCount++; // Increment incorrect count for timeout
+                playSound('incorrect'); // Play incorrect sound for timeout
+                updateLives(); // Update lives display
+                updateCorrectIncorrectDisplay(); // Update counts display
+                
+                // Disable input and submit button
+                answerInput.disabled = true;
+                submitButton.disabled = true;
+                nextButton.classList.remove('hidden'); // Show next question button
+                nextButton.focus();
+
+                // Check if game over due to no lives
+                if (lives === 0) {
+                    setTimeout(() => endGame("Game Over!"), 2000); // Delay before showing summary
+                } else if (currentQuestionIndex >= currentQuestions.length -1 && lives > 0) {
+                    // If it's the last question and time runs out, but player has lives, still end game.
+                     setTimeout(() => endGame("Game Over!"), 2000);
+                }
+            }
+
+            // Moves to the next question
+            function nextQuestion() {
+                currentQuestionIndex++;
+                loadQuestion(); // Load the subsequent question
+            }
+
+            // Displays a celebration animation when a level is completed
+            function displayCelebrationAnimation(summaryHeadingElement) {
+                const originalMessage = summaryHeadingElement.textContent;
+                // Add emojis with a span for animation targeting
+                summaryHeadingElement.innerHTML = `${originalMessage} <span id="celebration-emojis" style="display: inline-block; font-size: 1.2em;">🎉🏆✨</span>`;
+
+                const emojiSpan = document.getElementById('celebration-emojis');
+                if (emojiSpan) {
+                    let scale = 1;
+                    let growing = true;
+                    // Simple pulse animation for the emojis
+                    const animationInterval = setInterval(() => {
+                        scale += growing ? 0.05 : -0.05;
+                        if (scale > 1.4) growing = false; // Max scale
+                        if (scale < 1.0) growing = true;  // Min scale
+                        emojiSpan.style.transform = `scale(${scale})`;
+                    }, 100); // Animation speed
+
+                    // After 4 seconds, clear animation and restore original message
+                    setTimeout(() => {
+                        clearInterval(animationInterval);
+                        summaryHeadingElement.textContent = originalMessage; // Restore original text
+                    }, 4000); // Duration of the celebration display
+                } else {
+                    // Fallback if span somehow isn't found, just restore after timeout
+                     setTimeout(() => {
+                        summaryHeadingElement.textContent = originalMessage;
+                    }, 4000);
+                }
+            }
+
+            // Ends the game and displays the summary screen
+            function endGame(message) {
+                clearInterval(timer); // Ensure timer is stopped
+                gameContainer.classList.add('hidden');
+                summaryContainer.classList.remove('hidden');
+                const summaryHeading = document.querySelector('#summary-container h2');
+                finalScoreDisplay.textContent = `Your final score is: ${score}`;
+                nextLevelButton.classList.add('hidden'); // Hide by default, show only if applicable
+
+                if (message === "Congratulations!") {
+                    const currentDifficulty = difficultySelect.value;
+                    if (currentDifficulty === 'hard') {
+                        summaryHeading.textContent = "Congratulations! You\'ve completed all levels!";
+                        // nextLevelButton remains hidden
+                    } else {
+                        summaryHeading.textContent = message; // Regular "Congratulations!"
+                        nextLevelButton.classList.remove('hidden'); // Show "Next Level" button
+                    }
+                    playSound('levelComplete'); // Play level completion sound
+                    displayCelebrationAnimation(summaryHeading); // Show celebration animation
+                } else {
+                    summaryHeading.textContent = message; // e.g., "Game Over!"
+                }
+                
+                // Stop music if it's playing
+                if (musicPlayer && isMusicPlaying) {
+                    try {
+                        musicPlayer.stop();
+                    } catch (e) {
+                        console.warn("Error stopping music player:", e);
+                    }
+                }
+            }
+            // --- End of Core Game Logic Functions ---
+
+            // --- UI Update Functions ---
+            // UI update functions keep the visual state in sync with the underlying game state.
+            // They ensure that score, lives, and progress are always accurately displayed to the player.
+            // This separation allows for consistent updates and easier UI redesigns in the future.
+            // Updates the score display on the screen
+            function updateScore() {
+                scoreDisplay.textContent = `Score: ${score}`;
+            }
+
+            // Updates the lives display on the screen (using heart emojis)
+            function updateLives() {
+                livesDisplay.innerHTML = `Lives: ${'❤️'.repeat(lives)}${'🖤'.repeat(3 - lives)}`;
+            }
+
+            // Updates the correct and incorrect answer counts display
+            function updateCorrectIncorrectDisplay() {
+                correctAnswersDisplay.textContent = `Correct: ${correctAnswersCount}`;
+                incorrectAnswersDisplay.textContent = `Incorrect: ${incorrectAnswersCount}`;
+            }
+            // --- End of UI Update Functions ---
+
+            // --- Timer Functions ---
+            // Timer functions manage the countdown for each question, enforcing time-based challenge and urgency.
+            // They handle starting, updating, and clearing the timer, and trigger timeouts when needed.
+            // This modular approach allows for easy adjustment of time limits and supports features like difficulty scaling.
+            // Starts the timer for the current question
+            function startTimer() {
+                const timeLimit = difficultySelect.value === 'hard' ? 20 : 30; // Set time based on difficulty
+                timeLeft = timeLimit;
+                timerDisplay.textContent = `Time: ${timeLeft}`;
+                timer = setInterval(() => {
+                    timeLeft--;
+                    timerDisplay.textContent = `Time: ${timeLeft}`;
+                    if (timeLeft <= 0) {
+                        handleTimeout(); // Call handleTimeout when time is up
+                    }
+                }, 1000); // Update every second
+            }
+
+            // Resets (clears) the current timer
+            function resetTimer() {
+                clearInterval(timer);
+            }
+            // --- End of Timer Functions ---
+            
+            // --- Sound and Music Functions ---
+            // This section controls all audio feedback, including sound effects and background music.
+            // Sound enhances the emotional impact of game events (correct/incorrect answers, level completion) and increases immersion.
+            // Modular sound functions make it easy to add new effects, support toggling, and ensure accessibility for all users.
+            // Plays a sound effect (correct or incorrect)
+            function playSound(type) {
+                if (Tone && isMusicPlaying) { // Check if Tone.js is loaded and music is enabled
+                    try {
+                        const synth = new Tone.Synth().toDestination();
+                        if (type === 'correct') {
+                            synth.triggerAttackRelease("C5", "8n", Tone.now()); // Higher pitch for correct
+                        } else if (type === 'incorrect') {
+                            synth.triggerAttackRelease("A2", "8n", Tone.now()); // Lower pitch for incorrect
+                        } else if (type === 'levelComplete') {
+                            // Play a cheerful sequence for level completion
+                            const now = Tone.now();
+                            synth.triggerAttackRelease("C4", "8n", now);
+                            synth.triggerAttackRelease("E4", "8n", now + 0.2);
+                            synth.triggerAttackRelease("G4", "8n", now + 0.4);
+                            synth.triggerAttackRelease("C5", "4n", now + 0.6);
+                        }
+                    } catch (error) {
+                        console.warn('Sound playback failed:', error);
+                    }
+                }
+            }
+            // Toggles background music on or off
+            function toggleMusic() {
+                if (!Tone || !Tone.context || Tone.context.state !== 'running') {
+                    // Attempt to resume AudioContext if not running (e.g., due to browser policy)
+                    if (Tone && Tone.context && Tone.context.resume) {
+                        Tone.context.resume().then(() => {
+                            console.log("AudioContext resumed successfully.");
+                            actuallyToggleMusic(); // Now try toggling again
+                        }).catch(e => console.error("Error resuming AudioContext:", e));
+                    } else {
+                        console.warn("Tone.js or AudioContext not available or cannot be resumed. Sound disabled.");
+                        musicToggleButton.textContent = '🎵 Sound: N/A'; // Indicate sound is not available
+                        isMusicPlaying = false;
+                        return;
+                    }
+                } else {
+                    actuallyToggleMusic(); // AudioContext is running, proceed as normal
+                }
+            }
+
+            function actuallyToggleMusic() {
+                if (!musicPlayer) { // Initialize player if it doesn't exist
+                    // Simple synth for background melody - can be expanded
+                    musicPlayer = new Tone.Synth({
+                        oscillator: {
+                            type: 'triangle8' // A softer oscillator type
+                        },
+                        envelope: {
+                            attack: 0.02,
+                            decay: 0.1,
+                            sustain: 0.2,
+                            release: 0.8
+                        }
+                    }).toDestination();
+                }
+
+                if (isMusicPlaying) {
+                    try {
+                        musicPlayer.triggerRelease(); // Stop the current note smoothly
+                        // Potentially stop a sequence if one was started
+                        if (Tone.Transport.state === "started") {
+                            Tone.Transport.stop();
+                            Tone.Transport.cancel(); // Clear any scheduled events
+                        }
+                    } catch (e) {
+                        console.error("Error stopping sound:", e);
+                    }
+                    musicToggleButton.textContent = '🎵 Sound: OFF';
+                    isMusicPlaying = false;
+                } else {
+                    try {
+                        // Example: Play a simple C4 note or a short sequence
+                        // musicPlayer.triggerAttackRelease('C4', '8n'); 
+                        // For continuous music, you'd use Tone.Transport and Tone.Loop or Tone.Sequence
+                        // This is a placeholder for starting actual background music
+                        // For now, let's just confirm it's 'ON' without continuous play to avoid complexity
+                        // If you want actual music, a Tone.Loop or Tone.Sequence would be added here.
+                        playSound('correct'); // Play a sound to indicate it's on
+                    } catch (e) {
+                        console.error("Error starting sound:", e);
+                    }
+                    musicToggleButton.textContent = '🎵 Sound: ON';
+                    isMusicPlaying = true;
+                }
+            }
+            // --- End of Sound and Music Functions ---
+        });
+    </script>
+    <!-- End of JavaScript Game Logic -->
 </body>
 </html>
